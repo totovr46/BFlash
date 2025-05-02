@@ -38,6 +38,15 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Deck'
   }],
+  // --- Add Streak Fields ---
+  lastLoginDate: {
+    type: Date,
+    default: null // Initialize as null
+  },
+  currentStreak: {
+    type: Number,
+    default: 0 // Initialize streak at 0
+  },
   createdAt: {
     type: Date,
     default: Date.now

@@ -234,7 +234,70 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
         }
-        
+
+        /* Streak Display Styles - Updated Location & Size */
+        .streak-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;  /* Center the icon/text inside */
+            padding: 15px 20px;       /* Increased padding for more height */
+            border-radius: 12px;
+            background-color: var(--gray);
+            cursor: default;
+            width: 100%;              /* Match parent width */
+            max-width: 280px;         /* Match games-grid max-width */
+            margin-top: 20px;         /* Space above the streak display */
+            box-sizing: border-box;   /* Include padding in width calculation */
+        }
+
+        .streak-icon {
+            color: #ff9500;
+            margin-right: 10px;        /* Slightly more space */
+            font-size: 24px;           /* Larger icon */
+            transition: color 0.3s ease;
+            animation: pulse-fire 1.5s infinite ease-in-out;
+        }
+
+        .streak-count {
+            color: var(--text);
+            font-weight: 700;
+            font-size: 22px;           /* Larger count */
+        }
+
+        .streak-label {
+            color: var(--text);
+            font-weight: 500;
+            font-size: 18px;           /* Larger label */
+            margin-left: 8px;         /* Slightly more space */
+        }
+
+
+        /* Active streak styles remain the same */
+        .streak-display.active-streak .streak-icon {
+            color: #ff9500;
+        }
+
+        @keyframes pulse-fire { /* Animation defined here */
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Remove grid-related styles from responsive section if they were added for the streak */
+        @media (max-width: 1024px) {
+            .main-container {
+                /* Keep previous responsive styles for stacking */
+                flex-direction: column;
+                display: flex;
+            }
+            /* Remove streak-specific grid/order rules if they were added */
+            .games-section {
+                /* Reset order if previously set */
+                order: 0;
+                /* Align items center if needed */
+                align-items: center;
+            }
+        }  
         .game-icon {
             height: 50px;
             border-radius: 12px;
