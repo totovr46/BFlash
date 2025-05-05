@@ -400,14 +400,14 @@
         <div class="flashcard-inner">
             <div class="flashcard-front">
                 <div class="flashcard-header">
-                    <div class="deck-name" id="deck-name">Caricamento...</div>
-                    <div class="set-name" id="set-name">Caricamento...</div>
+                    <div class="deck-name" id="deck-name">Loading...</div>
+                    <div class="set-name" id="set-name">Loading...</div>
                 </div>
-                <div class="flashcard-content question" id="flashcard-content-question">Caricamento...</div>
-                <div class="tap-to-see" id="tap-to-see">Tocca per vedere la risposta</div>
+                <div class="flashcard-content question" id="flashcard-content-question">Loading...</div>
+                <div class="tap-to-see" id="tap-to-see">Click to see the answer</div>
             </div>
             <div class="flashcard-back">
-                <div class="flashcard-content answer" id="flashcard-content-answer">Risposta...</div>
+                <div class="flashcard-content answer" id="flashcard-content-answer">Answer...</div>
             </div>
         </div>
     </div>
@@ -548,7 +548,7 @@ async function loadDeckAndSetNames(deckId, setId) {
         displayCard();
     } catch (error) {
         console.error('Errore:', error);
-        alert('Errore nel caricamento delle flashcard per ripetizione.');
+        alert('Error in loading cards in repetition mode.');
     }
 }
 
@@ -558,7 +558,7 @@ async function loadDeckAndSetNames(deckId, setId) {
                     headers: { 'x-auth-token': localStorage.getItem('token') }
                 });
 
-                if (!response.ok) throw new Error('Errore nel caricamento delle flashcard non conosciute');
+                if (!response.ok) throw new Error('Error in loading unknown cards');
 
                 currentCards = await response.json();
                 
@@ -567,8 +567,8 @@ async function loadDeckAndSetNames(deckId, setId) {
                     await loadDeckAndSetNames(currentCards[0].deck, currentCards[0].set);
                 }
             } catch (error) {
-                console.error('Errore nel caricamento delle flashcard non conosciute:', error);
-                alert('Errore nel caricamento delle flashcard non conosciute.');
+                console.error('Error in loading unknown cards:', error);
+                alert('Error in loading unknown cards.');
             }
         }
 
@@ -580,7 +580,7 @@ async function loadDeckAndSetNames(deckId, setId) {
                     }
                 });
         
-                if (!response.ok) throw new Error('Errore nel caricamento delle flashcard del deck');
+                if (!response.ok) throw new Error('Error in loading cards');
         
                 currentCards = await response.json();
             } catch (error) {

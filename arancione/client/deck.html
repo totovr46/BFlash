@@ -968,7 +968,7 @@ setElement.innerHTML = `
             <div class="progress-bar" style="width: 0%;"></div>
         </div>
         <div class="progress-stats">
-            <span>0 conosciute • 0 da studiare</span>
+            <span>0 Known • 0 Unknown</span>
         </div>
     </div>
 `;
@@ -1043,7 +1043,7 @@ setElement.addEventListener('click', (e) => {
     
                 progressBar.style.width = `${progressPercentage}%`;
                 progressStats.innerHTML = `
-                    <span>${knownCount} conosciute • ${unknownCount} da studiare</span>
+                    <span>${knownCount} Known • ${unknownCount} Unknown</span>
                 `;
             } catch (error) {
                 console.error('Errore nel caricamento delle statistiche per set:', error);
