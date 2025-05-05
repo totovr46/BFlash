@@ -6,7 +6,99 @@ const Deck = require('../models/Deck'); // Needed if implementing cascade delete
 const SetModel = require('../models/Set'); // Renamed Set to SetModel to avoid conflict
 const Card = require('../models/Card'); // Needed if implementing cascade delete
 const auth = require('../middleware/auth');
+const { set } = require('mongoose');
 const router = express.Router();
+
+/**
+ * @route   GET /api/users/me/stats
+ * @desc    Get statistics for the logged-in user
+ * @access  Private
+ */
+router.get('/me/stats', auth, async (req, res) => {
+  try {
+      const userId = req.user.id;
+
+      // --- Fetch User Data (including streak) ---
+      const user = await User.findById(userId).select('currentStreak'); // Select only the streak field
+      if (!user) {
+          // This case should ideally not happen if auth middleware works
+           return res.status(404).json({ message: 'User not found for stats' });
+      }
+      const currentStreak = user.currentStreak || 0; // Get streak from user doc
+
+      // --- Fetch Decks ---
+      // ... (rest of the deck, set, card fetching logic remains the same) ...
+      const userDecks = await Deck.find({ owner: userId });
+      const totalDecks = userDecks.length;
+      const deckIds = userDecks.map(deck => deck._id);
+
+      if (totalDecks === 0) {
+          return res.json({
+              totalDecks: 0, totalSets: 0, totalCards: 0,
+              knownCards: 0, unknownCards: 0,
+              currentStreak: currentStreak, // Return fetched streak
+              masteredSetsCount: 0
+          });
+      }
+
+      // --- Fetch Sets ---
+      const userSets = await SetModel.find({ deck: { $in: deckIds } });
+      const totalSets = userSets.length;
+      const setIds = userSets.map(set => set._id);
+
+      if (totalSets === 0) {
+           return res.json({
+              totalDecks: totalDecks, totalSets: 0, totalCards: 0,
+              knownCards: 0, unknownCards: 0,
+              currentStreak: currentStreak, // Return fetched streak
+              masteredSetsCount: 0
+          });
+      }
+
+      // --- Fetch Cards ---
+      const userCards = await Card.find({ set: { $in: setIds } });
+      const totalCards = userCards.length;
+
+      // --- Calculate Card Knowledge ---
+      let knownCards = 0;
+      let unknownCards = 0;
+      userCards.forEach(card => {
+          if (card.known === 'yes') knownCards++;
+          else unknownCards++;
+      });
+
+      // --- Calculate Mastered Sets ---
+      const MIN_CARDS_FOR_MASTERY = 5;
+      let masteredSetsCount = 0;
+      const cardsBySet = userCards.reduce((acc, card) => {
+           const setId = card.set.toString();
+           if (!acc[setId]) acc[setId] = [];
+           acc[setId].push(card);
+           return acc;
+       }, {});
+
+      for (const setId of setIds) {
+          const cardsInSet = cardsBySet[setId.toString()] || [];
+          if (cardsInSet.length >= MIN_CARDS_FOR_MASTERY) {
+              if (cardsInSet.every(card => card.known === 'yes')) {
+                  masteredSetsCount++;
+              }
+          }
+      }
+
+      // --- Construct Response ---
+      res.json({
+          totalDecks, totalSets, totalCards,
+          knownCards, unknownCards,
+          currentStreak, // Return the actual streak
+          masteredSetsCount
+      });
+
+  } catch (err) {
+      console.error("Error in /api/users/me/stats:", err.message);
+      res.status(500).json({ message: 'Server Error retrieving stats' });
+  }
+});
 
 // Ottieni profilo utente corrente
 router.get('/me', auth, async (req, res) => {
@@ -117,6 +209,7 @@ router.put('/me/password', auth, async (req, res) => {
 router.delete('/me', auth, async (req, res) => {
     try {
         const userId = req.user.id;
+
         const user = await User.findById(userId);
 
         if (!user) {
