@@ -157,7 +157,7 @@
                 </div>
                 <div class="form-group">
                     <label for="deck-description" class="form-label">Description (optional)</label>
-                    <textarea id="deck-description" class="form-input" placeholder="Inserisci una descrizione"></textarea>
+                    <textarea id="deck-description" class="form-input" placeholder="Enter a descriptio"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="deck-color" class="form-label">Color</label>
@@ -688,7 +688,7 @@
             
             deckElement.querySelector('.deck-menu-item.delete').addEventListener('click', (e) => {
                 e.stopPropagation();
-                const confirmDelete = confirm('Sei sicuro di voler eliminare questo deck? Tutti i set e le flashcard al suo interno verranno eliminati.');
+                const confirmDelete = confirm('Are you sure you want to delete this deck? All sets and flashcards inside it will be deleted.');
                 if (confirmDelete) {
                     deleteDeck(deck._id);
                 }
@@ -805,7 +805,7 @@ async function editDeck(deckId, currentSubject, currentDescription, currentColor
                     }
                 });
                 
-                if (!response.ok) throw new Error(`Errore nel caricamento delle card per il deck ${deckId}`);
+                if (!response.ok) throw new Error(`Error loading cards for the deck ${deckId}`);
                 
                 const cards = await response.json();
                 
@@ -826,7 +826,7 @@ async function editDeck(deckId, currentSubject, currentDescription, currentColor
                     <span>${knownCount} Known • ${unknownCount} Unknown</span>
                 `;
             } catch (error) {
-                console.error('Errore nel caricamento delle statistiche per deck:', error);
+                console.error('Error loading statistics for the deck:', error);
             }
         }
         
@@ -1028,7 +1028,7 @@ async function editDeck(deckId, currentSubject, currentDescription, currentColor
                 if (results.length === 0) {
                     searchResultsContainer.innerHTML = `
                         <div class="no-results">
-                            Nessun risultato trovato per "${query}"
+                            No results found for "${query}"
                         </div>`;
                     return;
                 }
@@ -1069,7 +1069,7 @@ async function editDeck(deckId, currentSubject, currentDescription, currentColor
                 console.error('Error during search:', error);
                 searchResultsContainer.innerHTML = `
                     <div class="error-message">
-                        Errore durante la ricerca. Riprova più tardi.
+                        Error during search. Please try again later.
                     </div>`;
             }
         }

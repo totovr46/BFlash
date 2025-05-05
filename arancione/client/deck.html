@@ -798,14 +798,14 @@
 <div class="modal" id="move-set-modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal">&times;</span>
-        <h2>Sposta set</h2>
+        <h2>Move set</h2>
         <div class="form-group">
-            <label class="form-label">Seleziona il deck di destinazione</label>
+            <label class="form-label">Select the target deck</label>
             <select id="target-deck-select" class="form-input">
-                <option value="">Seleziona un deck...</option>
+                <option value="">Select a deck...</option>
             </select>
         </div>
-        <button id="move-set-button" class="auth-button" disabled>Sposta set</button>
+        <button id="move-set-button" class="auth-button" disabled>Move set</button>
     </div>
 </div>
 
@@ -884,8 +884,8 @@ function loadUserProfile() {
                 document.title = `${deckData.subject || 'Mazzo'} - Bflash`;
                 
             } catch (error) {
-                console.error('Errore:', error);
-                alert(`Errore: ${error.message}`);
+                console.error('Error:', error);
+                alert(`Error: ${error.message}`);
             }
         }
         
@@ -906,7 +906,7 @@ async function loadSets() {
         // Carica le statistiche iniziali
 
     } catch (error) {
-        console.error('Errore:', error);
+        console.error('Error:', error);
         document.getElementById('sets-container').innerHTML =
             '<div class="no-sets">Error loading sets. Please try again later.</div>';
     }
@@ -1029,7 +1029,7 @@ setElement.addEventListener('click', (e) => {
                     }
                 });
     
-                if (!response.ok) throw new Error(`Errore nel caricamento delle statistiche per il set ${set.name}`);
+                if (!response.ok) throw new Error(`Error nel caricamento delle statistiche per il set ${set.name}`);
     
                 const stats = await response.json();
                 const knownCount = stats.known || 0;
@@ -1046,7 +1046,7 @@ setElement.addEventListener('click', (e) => {
                     <span>${knownCount} Known • ${unknownCount} Unknown</span>
                 `;
             } catch (error) {
-                console.error('Errore nel caricamento delle statistiche per set:', error);
+                console.error('Error loading statistics for the set:', error);
             }
         }
     
@@ -1069,8 +1069,8 @@ setElement.addEventListener('click', (e) => {
                 currentSets = currentSets.filter(set => set._id !== setId);
                 displaySets(currentSets);
             } catch (error) {
-                console.error('Errore:', error);
-                alert(`Errore: ${error.message}`);
+                console.error('Error:', error);
+                alert(`Error: ${error.message}`);
             }
         }
 
@@ -1107,8 +1107,8 @@ setElement.addEventListener('click', (e) => {
                 // Chiudi il modale
                 document.getElementById('edit-set-modal').style.display = 'none';
             } catch (error) {
-                console.error('Errore:', error);
-                alert(`Errore: ${error.message}`);
+                console.error('Error:', error);
+                alert(`Error: ${error.message}`);
             }
         });
 
@@ -1195,7 +1195,7 @@ async function performSearch(query) {
         if (results.length === 0) {
             searchResultsContainer.innerHTML = `
                 <div class="no-results">
-                    Nessun risultato trovato per "${query}"
+                    No results found for "${query}"
                 </div>`;
             return;
         }
@@ -1235,7 +1235,7 @@ async function performSearch(query) {
         console.error('Error during search:', error);
         searchResultsContainer.innerHTML = `
             <div class="error-message">
-                Errore durante la ricerca. Riprova più tardi.
+                Error during search.
             </div>`;
     }
 }
@@ -1275,8 +1275,8 @@ async function performSearch(query) {
             document.getElementById('add-set-form').reset();
             
         } catch (error) {
-            console.error('Errore:', error);
-            alert(`Errore: ${error.message}`);
+            console.error('Error:', error);
+            alert(`Error: ${error.message}`);
         }
     });
     
@@ -1297,8 +1297,8 @@ async function performSearch(query) {
                 window.location.href = 'index.html';
                 
             } catch (error) {
-                console.error('Errore:', error);
-                alert(`Errore: ${error.message}`);
+                console.error('Error:', error);
+                alert(`Error: ${error.message}`);
             }
         }
     });
@@ -1468,11 +1468,11 @@ document.getElementById('move-set-button').addEventListener('click', async funct
         
         // Chiudi il modale
         document.getElementById('move-set-modal').style.display = 'none';
-        alert('Set spostato con successo!');
+        alert('Set moved successfully!');
         
     } catch (error) {
         console.error('Error:', error);
-        alert('Errore nello spostamento del set');
+        alert('Error moving the set');
     }
 });
 
@@ -1490,7 +1490,7 @@ async function loadDecksForMove() {
         const decks = await response.json();
         const deckSelect = document.getElementById('target-deck-select');
         
-        deckSelect.innerHTML = '<option value="">Seleziona un deck...</option>';
+        deckSelect.innerHTML = '<option value="">Select a deck...</option>';
         decks.forEach(deck => {
             // Escludi il deck corrente
             if (deck._id !== currentDeckId) {
@@ -1500,7 +1500,7 @@ async function loadDecksForMove() {
         
     } catch (error) {
         console.error('Error:', error);
-        alert('Errore nel caricamento dei deck');
+        alert('Error loading decks');
     }
 }
 

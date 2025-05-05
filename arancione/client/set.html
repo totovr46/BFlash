@@ -659,13 +659,13 @@
         </div>
         <div class="mobile-menu" id="mobile-menu">
             <div class="mobile-menu-item" id="mobile-toggle-answer">
-                <i class="fas fa-eye"></i> Mostra/Nascondi risposte
+                <i class="fas fa-eye"></i> Show/Hide answers
             </div>
             <div class="mobile-menu-item" id="mobile-edit">
-                <i class="fas fa-edit"></i> Modifica set
+                <i class="fas fa-edit"></i> Edit set
             </div>
             <div class="mobile-menu-item delete" id="mobile-delete">
-                <i class="fas fa-trash"></i> Elimina set
+                <i class="fas fa-trash"></i> Delete set
             </div>
         </div>
     </div>
@@ -689,22 +689,22 @@
     
     <!-- Cards Container -->
     <div class="cards-container" id="cards-container">
-        <div class="no-cards">Nessuna flashcard presente. Aggiungi la tua prima flashcard!</div>
+        <div class="no-cards">No flashcards available. Add your first flashcard!</div>
     </div>
     
     <!-- Add Card Modal -->
     <div class="modal" id="add-card-modal" style="display: none;">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
-            <h2>Crea nuova flashcard</h2>
+            <h2>Create new flashcard</h2>
             <form id="add-card-form">
                 <div class="form-group">
-                    <input type="text" id="card-question" class="form-input" placeholder="Domanda" required>
+                    <input type="text" id="card-question" class="form-input" placeholder="Question" required>
                 </div>
                 <div class="form-group">
-                    <textarea id="card-answer" class="form-input" placeholder="Risposta" rows="4" required></textarea>
+                    <textarea id="card-answer" class="form-input" placeholder="Answer" rows="4" required></textarea>
                 </div>
-                <button type="submit" class="auth-button">Crea flashcard</button>
+                <button type="submit" class="auth-button">Create flashcard</button>
             </form>
         </div>
     </div>
@@ -716,12 +716,12 @@
             <h2>Edit flashcard</h2>
             <form id="edit-card-form">
                 <div class="form-group">
-                    <input type="text" id="edit-card-question" class="form-input" placeholder="Domanda" required>
+                    <input type="text" id="edit-card-question" class="form-input" placeholder="Question" required>
                 </div>
                 <div class="form-group">
-                    <textarea id="edit-card-answer" class="form-input" placeholder="Risposta" rows="4" required></textarea>
+                    <textarea id="edit-card-answer" class="form-input" placeholder="Answer" rows="4" required></textarea>
                 </div>
-                <button type="submit" class="auth-button">Salva modifiche</button>
+                <button type="submit" class="auth-button">Save changes</button>
             </form>
         </div>
     </div>
@@ -730,11 +730,11 @@
     <div class="modal" id="delete-modal" style="display: none;">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
-            <h2>Conferma eliminazione</h2>
-            <p style="margin-bottom: 20px;">Sei sicuro di voler eliminare questa flashcard?</p>
+            <h2>Confirm deletion</h2>
+            <p style="margin-bottom: 20px;">Are you sure you want to delete this flashcard?</p>
             <div style="display: flex; gap: 10px;">
-                <button class="auth-button" id="cancel-delete" style="background-color: var(--gray);">Annulla</button>
-                <button class="auth-button" id="confirm-delete" style="background-color: #dc3545;">Elimina</button>
+                <button class="auth-button" id="cancel-delete" style="background-color: var(--gray);">Cancel</button>
+                <button class="auth-button" id="confirm-delete" style="background-color: #dc3545;">Delete</button>
             </div>
         </div>
     </div>
@@ -743,25 +743,25 @@
 <div class="modal" id="move-card-modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal">&times;</span>
-        <h2>Sposta flashcard</h2>
+        <h2>Move flashcard</h2>
         <div class="form-group">
-            <label class="form-label">Seleziona il deck</label>
+            <label class="form-label">Select the deck</label>
             <select id="target-deck-select" class="form-input">
-                <option value="">Seleziona un deck...</option>
+                <option value="">Select a deck...</option>
             </select>
         </div>
         <div class="form-group">
-            <label class="form-label">Seleziona il set</label>
+            <label class="form-label">Select the set</label>
             <select id="target-set-select" class="form-input" disabled>
-                <option value="">Seleziona prima un deck...</option>
+                <option value="">Select a deck first</option>
             </select>
         </div>
-        <button id="move-card-button" class="auth-button" disabled>Sposta flashcard</button>
+        <button id="move-card-button" class="auth-button" disabled>Move flashcard</button>
     </div>
 </div>
     
 <div id="flashcard-container" style="margin-top: 20px; padding: 20px; background-color: var(--card-background); border-radius: 12px; display: none;">
-    <h2>Risultato grezzo dell'IA:</h2>
+    <h2>Raw AI result:</h2>
     <pre id="flashcard-content" style="white-space: pre-wrap; word-wrap: break-word;"></pre>
 </div>
 
@@ -771,19 +771,19 @@
         <div class="modal-content">
             <span class="close-modal">&times;</span>
             <div class="form-group">
-                <textarea id="flashcard-source-text" class="form-input" placeholder="Inserisci qui il testo da cui generare le flashcard..." rows="8" required></textarea>
+                <textarea id="flashcard-source-text" class="form-input" placeholder="Enter the text to generate flashcards from here..." rows="8" required></textarea>
             </div>
             <div class="generate-buttons">
-                <button id="cancel-generate" class="auth-button secondary">Annulla</button>
+                <button id="cancel-generate" class="auth-button secondary">Cancel</button>
                 <button id="start-generate" class="auth-button primary">
-                    <i class="fas fa-magic"></i> Genera
+                    <i class="fas fa-magic"></i> Generate
                 </button>
             </div>
             <div id="generate-loading" class="loading-container" style="display: none;">
                 <div class="loading-spinner">
                     <i class="fas fa-spinner fa-spin"></i>
                 </div>
-                <p>Sto elaborando il testo e creando flashcard...</p>
+                <p>Processing the text and creating flashcards...</p>
             </div>
         </div>
     </div>
@@ -841,15 +841,15 @@
                     }
                 });
                 
-                if (!response.ok) throw new Error('Errore nel caricamento del set');
+                if (!response.ok) throw new Error('Error loading set');
                 
                 const setData = await response.json();
                 document.getElementById('set-title').textContent = setData.name || 'Senza titolo';
                 document.title = `${setData.name || 'Set'} - Bflash`;
                 
             } catch (error) {
-                console.error('Errore:', error);
-                alert(`Errore: ${error.message}`);
+                console.error('Error:', error);
+                alert(`Error: ${error.message}`);
             }
         }
         
@@ -862,15 +862,15 @@
                     }
                 });
 
-                if (!response.ok) throw new Error('Errore nel caricamento delle flashcard');
+                if (!response.ok) throw new Error('Error loading flashcards');
 
                 currentCards = await response.json();
                 displayCards(currentCards);
 
             } catch (error) {
-                console.error('Errore:', error);
+                console.error('Error:', error);
                 document.getElementById('cards-container').innerHTML =
-                    '<div class="no-cards">Errore nel caricamento delle flashcard. Riprova più tardi.</div>';
+                    '<div class="no-cards">Error loading flashcards. Please try again later.</div>';
             }
         }
         
@@ -880,7 +880,7 @@
             container.innerHTML = '';
         
             if (!cards || cards.length === 0) {
-                container.innerHTML = '<div class="no-cards">Nessuna flashcard presente. Aggiungi la tua prima flashcard!</div>';
+                container.innerHTML = '<div class="no-cards">No flashcards available. Add your first flashcard!</div>';
                 studySetButton.style.display = 'none';
                 return;
             }
@@ -1030,7 +1030,7 @@ async function performSearch(query) {
         if (results.length === 0) {
             searchResultsContainer.innerHTML = `
                 <div class="no-results">
-                    Nessun risultato trovato per "${query}"
+                    No results found for "${query}"
                 </div>`;
             return;
         }
@@ -1069,7 +1069,7 @@ async function performSearch(query) {
         console.error('Error during search:', error);
         searchResultsContainer.innerHTML = `
             <div class="error-message">
-                Errore durante la ricerca. Riprova più tardi.
+                Error during search. Retry later.
             </div>`;
     }
 }
@@ -1101,7 +1101,7 @@ async function performSearch(query) {
                         body: JSON.stringify({ question, answer })
                     });
                     
-                    if (!response.ok) throw new Error('Errore nella creazione della flashcard');
+                    if (!response.ok) throw new Error('Error creating flashcard');
                     
                     const newCard = await response.json();
                     currentCards.push(newCard);
@@ -1110,8 +1110,8 @@ async function performSearch(query) {
                     document.getElementById('add-card-form').reset();
                     
                 } catch (error) {
-                    console.error('Errore:', error);
-                    alert(`Errore: ${error.message}`);
+                    console.error('Error:', error);
+                    alert(`Error: ${error.message}`);
                 }
             });
             
@@ -1131,7 +1131,7 @@ async function performSearch(query) {
                         body: JSON.stringify({ question, answer })
                     });
                     
-                    if (!response.ok) throw new Error('Errore nella modifica della flashcard');
+                    if (!response.ok) throw new Error('Error while editing the flashcard');
                     
                     const updatedCard = await response.json();
                     
@@ -1142,14 +1142,14 @@ async function performSearch(query) {
                     // Chiudi il modale
                     document.getElementById('edit-card-modal').style.display = 'none';
                 } catch (error) {
-                    console.error('Errore:', error);
-                    alert(`Errore: ${error.message}`);
+                    console.error('Error:', error);
+                    alert(`Error: ${error.message}`);
                 }
             });
             
             // Pulsante elimina set
             document.getElementById('delete-button').addEventListener('click', async () => {
-                if (confirm('Sei sicuro di voler eliminare questo set e tutte le sue flashcard? Questa azione non può essere annullata.')) {
+                if (confirm('Are you sure you want to delete this set and all its flashcards? This action cannot be undone.')) {
                     try {
                         const response = await fetch(`${API_URL}/sets/${currentDeckId}/sets/${currentSetId}`, {
                             method: 'DELETE',
@@ -1158,14 +1158,14 @@ async function performSearch(query) {
                             }
                         });
                         
-                        if (!response.ok) throw new Error('Errore nell\'eliminazione del set');
+                        if (!response.ok) throw new Error('Error deleting set');
                         
-                        alert('Set eliminato con successo!');
+                        alert('Set successfully deleted!');
                         window.location.href = `deck.html?id=${currentDeckId}`;
                         
                     } catch (error) {
-                        console.error('Errore:', error);
-                        alert(`Errore: ${error.message}`);
+                        console.error('Error:', error);
+                        alert(`Error: ${error.message}`);
                     }
                 }
             });
@@ -1180,7 +1180,7 @@ async function performSearch(query) {
                         }
                     });
                     
-                    if (!response.ok) throw new Error('Errore nell\'eliminazione della flashcard');
+                    if (!response.ok) throw new Error('Error deleting flashcard');
                     
                     currentCards = currentCards.filter(card => card._id !== currentDeleteCardId);
                     displayCards(currentCards);
@@ -1188,8 +1188,8 @@ async function performSearch(query) {
                     currentDeleteCardId = null;
                     
                 } catch (error) {
-                    console.error('Errore:', error);
-                    alert(`Errore: ${error.message}`);
+                    console.error('Error:', error);
+                    alert(`Error: ${error.message}`);
                 }
             });
             
@@ -1201,7 +1201,7 @@ async function performSearch(query) {
             
             // Pulsante modifica set
             document.getElementById('edit-button').addEventListener('click', async () => {
-                const newName = prompt('Inserisci il nuovo nome del set:', document.getElementById('set-title').textContent);
+                const newName = prompt('Enter the new name for the set:', document.getElementById('set-title').textContent);
                 
                 if (newName && newName.trim() !== '') {
                     try {
@@ -1214,14 +1214,14 @@ async function performSearch(query) {
                             body: JSON.stringify({ name: newName })
                         });
                         
-                        if (!response.ok) throw new Error('Errore nella modifica del set');
+                        if (!response.ok) throw new Error('Error updating the set');
                         
                         const updatedSet = await response.json();
                         document.getElementById('set-title').textContent = updatedSet.name;
                         
                     } catch (error) {
-                        console.error('Errore:', error);
-                        alert(`Errore: ${error.message}`);
+                        console.error('Error:', error);
+                        alert(`Error: ${error.message}`);
                     }
                 }
             });
@@ -1305,7 +1305,7 @@ async function performSearch(query) {
                 if (deckId) {
                     loadSetsForDeck(deckId);
                 } else {
-                    setSelect.innerHTML = '<option value="">Seleziona prima un deck...</option>';
+                    setSelect.innerHTML = '<option value="">Select a deck first</option>';
                     setSelect.disabled = true;
                     moveButton.disabled = true;
                 }
@@ -1340,11 +1340,10 @@ async function performSearch(query) {
                     
                     // Chiudi il modale
                     document.getElementById('move-card-modal').style.display = 'none';
-                    alert('Flashcard spostata con successo!');
                     
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('Errore nello spostamento della flashcard');
+                    alert('Error moving flashcard');
                 }
             });
 
@@ -1363,7 +1362,7 @@ async function performSearch(query) {
                         // Reset dei form e delle selezioni
                         if (modal.id === 'move-card-modal') {
                             document.getElementById('target-deck-select').value = '';
-                            document.getElementById('target-set-select').innerHTML = '<option value="">Seleziona prima un deck...</option>';
+                            document.getElementById('target-set-select').innerHTML = '<option value="">Select a deck first...</option>';
                             document.getElementById('target-set-select').disabled = true;
                             document.getElementById('move-card-button').disabled = true;
                             currentMoveCardId = null;
@@ -1412,7 +1411,7 @@ async function performSearch(query) {
             });
 
             document.getElementById('mobile-edit').addEventListener('click', async () => {
-                const newName = prompt('Inserisci il nuovo nome del set:', document.getElementById('set-title').textContent);
+                const newName = prompt('Enter the new name for the set:', document.getElementById('set-title').textContent);
                 if (newName && newName.trim() !== '') {
                     try {
                         const response = await fetch(`${API_URL}/sets/${currentDeckId}/sets/${currentSetId}`, {
@@ -1424,21 +1423,21 @@ async function performSearch(query) {
                             body: JSON.stringify({ name: newName })
                         });
                         
-                        if (!response.ok) throw new Error('Errore nella modifica del set');
+                        if (!response.ok) throw new Error('Error updating the set');
                         
                         const updatedSet = await response.json();
                         document.getElementById('set-title').textContent = updatedSet.name;
                         
                     } catch (error) {
-                        console.error('Errore:', error);
-                        alert(`Errore: ${error.message}`);
+                        console.error('Error:', error);
+                        alert(`Error: ${error.message}`);
                     }
                 }
                 mobileMenu.style.display = 'none';
             });
 
             document.getElementById('mobile-delete').addEventListener('click', async () => {
-                if (confirm('Sei sicuro di voler eliminare questo set e tutte le sue flashcard? Questa azione non può essere annullata.')) {
+                if (confirm('Are you sure you want to delete this set and all its flashcards? This action cannot be undone.')) {
                     try {
                         const response = await fetch(`${API_URL}/sets/${currentDeckId}/sets/${currentSetId}`, {
                             method: 'DELETE',
@@ -1447,14 +1446,14 @@ async function performSearch(query) {
                             }
                         });
                         
-                        if (!response.ok) throw new Error('Errore nell\'eliminazione del set');
+                        if (!response.ok) throw new Error('Error deleting set');
                         
-                        alert('Set eliminato con successo!');
+                        alert('Set successfully deleted!');
                         window.location.href = `deck.html?id=${currentDeckId}`;
                         
                     } catch (error) {
-                        console.error('Errore:', error);
-                        alert(`Errore: ${error.message}`);
+                        console.error('Error:', error);
+                        alert(`Error: ${error.message}`);
                     }
                 }
                 mobileMenu.style.display = 'none';
@@ -1476,7 +1475,7 @@ async function performSearch(query) {
                 const decks = await response.json();
                 const deckSelect = document.getElementById('target-deck-select');
                 
-                deckSelect.innerHTML = '<option value="">Seleziona un deck...</option>';
+                deckSelect.innerHTML = '<option value="">Select a deck...</option>';
                 decks.forEach(deck => {
                     // Usa deck.subject invece di deck.title
                     deckSelect.innerHTML += `<option value="${deck._id}">${deck.subject}</option>`;
@@ -1484,7 +1483,7 @@ async function performSearch(query) {
                 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Errore nel caricamento dei deck');
+                alert('Error loading decks');
             }
         }
         async function loadSetsForDeck(deckId) {
@@ -1500,7 +1499,7 @@ async function performSearch(query) {
                 const sets = await response.json();
                 const setSelect = document.getElementById('target-set-select');
                 
-                setSelect.innerHTML = '<option value="">Seleziona un set...</option>';
+                setSelect.innerHTML = '<option value="">Select a set...</option>';
                 sets.forEach(set => {
                     if (set._id !== currentSetId) { // Esclude il set corrente
                         setSelect.innerHTML += `<option value="${set._id}">${set.name}</option>`;
@@ -1511,7 +1510,7 @@ async function performSearch(query) {
                 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Errore nel caricamento dei set');
+                alert('Error loading sets');
             }
         }
         
@@ -1529,7 +1528,7 @@ async function performSearch(query) {
                     body: JSON.stringify({ text: userText })
                 });
         
-                if (!response.ok) throw new Error('Errore nella generazione delle flashcard.');
+                if (!response.ok) throw new Error('Error generating flashcards.');
         
                 const data = await response.json();
                 
@@ -1552,12 +1551,12 @@ async function performSearch(query) {
                         
                         partialFlashcards.forEach((card, index) => {
                             content.innerHTML += `<div style="margin-bottom: 15px;">
-                                <strong>${index + 1}. Domanda:</strong> ${escapeHtml(card.question)}<br>
-                                <strong>Risposta:</strong> ${escapeHtml(card.answer)}
+                                <strong>${index + 1}. Question:</strong> ${escapeHtml(card.question)}<br>
+                                <strong>Answer:</strong> ${escapeHtml(card.answer)}
                             </div>`;
                         });
                         
-                        content.innerHTML += `<br><strong>Vuoi utilizzare queste flashcard?</strong><br>
+                        content.innerHTML += `<br><strong>Do you want to use these flashcards?</strong><br>
                         <button id="use-partial-flashcards" style="margin-top: 10px" class="auth-button">Usa queste flashcard</button>`;
                         
                         container.style.display = 'block';
@@ -1567,7 +1566,7 @@ async function performSearch(query) {
                             container.style.display = 'none';
                         });
                     } else {
-                        content.innerHTML = `<strong>Errore nel parsing della risposta JSON. Risposta grezza:</strong><br><br>${escapeHtml(data.rawResponse)}`;
+                        content.innerHTML = `<strong>Error parsing the JSON response. Raw response:</strong><br><br>${escapeHtml(data.rawResponse)}`;
                         container.style.display = 'block';
                     }
                     return;
@@ -1576,8 +1575,8 @@ async function performSearch(query) {
                 // Mostra le flashcard in un formato migliore
                 displayGeneratedFlashcards(flashcards);
             } catch (error) {
-                console.error('Errore:', error);
-                alert('Errore nella generazione delle flashcard: ' + error.message);
+                console.error('Error:', error);
+                alert('Error generating flashcards: ' + error.message);
             }
         }
         
@@ -1648,7 +1647,7 @@ function tryParseFlashcards(rawResponse) {
             const a = aMatches[i].match(/"answer"\s*:\s*"([^"]+)"/)[1];
             manualCards.push({ question: q, answer: a });
         } catch (e) {
-            console.log("Errore estrazione manuale", e);
+            console.log("Error manual estraction", e);
         }
     }
 
@@ -1668,7 +1667,7 @@ function displayGeneratedFlashcards(flashcards) {
     // Verifica che flashcards sia un array valido
     if (!Array.isArray(flashcards)) {
         console.error("Le flashcard non sono in un formato valido:", flashcards);
-        alert("Errore: formato delle flashcard non valido");
+        alert("Flashcard successfully moved!");
         return;
     }
 
@@ -1676,7 +1675,7 @@ function displayGeneratedFlashcards(flashcards) {
     const isValid = flashcards.every(fc => fc.question && fc.answer);
     if (!isValid) {
         console.error("Alcune flashcard mancano di question o answer:", flashcards);
-        alert("Errore: alcune flashcard non hanno domanda o risposta");
+        alert("Error: some flashcards are missing a question or answer");
         return;
     }
     const modal = document.createElement('div');
@@ -1686,7 +1685,7 @@ function displayGeneratedFlashcards(flashcards) {
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 800px; width: 90%;">
             <span class="close-modal">&times;</span>
-            <h2>Flashcard generate</h2>
+            <h2>Result:</h2>
             <div class="generated-flashcards-container" style="max-height: 60vh; overflow-y: auto; margin: 20px 0;">
                 ${flashcards.map((fc, index) => `
                     <div class="generated-flashcard" style="background-color: var(--card-background); border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow-color);">
@@ -1700,17 +1699,17 @@ function displayGeneratedFlashcards(flashcards) {
                         </div>
                         <div style="text-align: right; margin-top: 10px;">
                             <input type="checkbox" id="select-flashcard-${index}" checked style="transform: scale(1.2); margin-right: 8px;">
-                            <label for="select-flashcard-${index}" style="cursor: pointer;">Seleziona</label>
+                            <label for="select-flashcard-${index}" style="cursor: pointer;">Select</label>
                         </div>
                     </div>
                 `).join('')}
             </div>
             <div style="display: flex; justify-content: space-between; margin-top: 20px;">
                 <button id="select-all-button" class="auth-button" style="background-color: var(--gray); color: var(--text);">
-                    <i class="fas fa-check-square"></i> Seleziona tutto
+                    <i class="fas fa-check-square"></i> Select all
                 </button>
                 <button id="add-selected-button" class="auth-button">
-                    <i class="fas fa-plus-circle"></i> Aggiungi selezionate
+                    <i class="fas fa-plus-circle"></i> Add selected
                 </button>
             </div>
         </div>
@@ -1734,8 +1733,8 @@ function displayGeneratedFlashcards(flashcards) {
         });
         
         e.target.innerHTML = allChecked 
-            ? '<i class="fas fa-check-square"></i> Seleziona tutto' 
-            : '<i class="fas fa-times-circle"></i> Deseleziona tutto';
+            ? '<i class="fas fa-check-square"></i> Select all' 
+            : '<i class="fas fa-times-circle"></i> Deselect all';
     });
 
     // Aggiungi le flashcard selezionate
@@ -1762,14 +1761,14 @@ function displayGeneratedFlashcards(flashcards) {
                 body: JSON.stringify(selectedFlashcards)
             });
 
-            if (!response.ok) throw new Error('Errore nell\'aggiunta delle flashcard.');
+            if (!response.ok) throw new Error('Error adding flashcards.');
 
             alert(`${selectedFlashcards.length} flashcard aggiunte con successo!`);
             modal.remove();
             loadCards();
         } catch (error) {
-            console.error('Errore:', error);
-            alert('Errore nell\'aggiunta delle flashcard: ' + error.message);
+            console.error('Error:', error);
+            alert('Error adding flashcards: ' + error.message);
         }
     });
 }
@@ -1802,7 +1801,7 @@ function displayGeneratedFlashcards(flashcards) {
                     })
                 });
         
-                if (!response.ok) throw new Error('Errore nella generazione delle flashcard.');
+                if (!response.ok) throw new Error('Error generating flashcards.');
         
                 const data = await response.json();
                 
@@ -1824,17 +1823,17 @@ function displayGeneratedFlashcards(flashcards) {
                     } else {
                         const container = document.getElementById('flashcard-container');
                         const content = document.getElementById('flashcard-content');
-                        content.innerHTML = `<strong>Errore nel parsing della risposta JSON. Risposta grezza:</strong><br><br>${escapeHtml(data.rawResponse)}`;
+                        content.innerHTML = `<strong>Error parsing the JSON response. Raw response:</strong><br><br>${escapeHtml(data.rawResponse)}`;
                         container.style.display = 'block';
                     }
                 } else {
                     displayGeneratedFlashcards(flashcards);
                 }
             } catch (error) {
-                console.error('Errore:', error);
+                console.error('Error:', error);
                 document.getElementById('generate-loading').style.display = 'none';
                 document.getElementById('start-generate').disabled = false;
-                alert('Errore nella generazione delle flashcard: ' + error.message);
+                alert('Error generating flashcards: ' + error.message);
             }
         }
 

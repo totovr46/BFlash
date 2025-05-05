@@ -17,26 +17,29 @@ router.post('/generate', async (req, res) => {
 
     try {
         const payload = {
-            model: 'gemma2-9b-it',
+            model: 'llama3-70b-8192',
             messages: [
                 {
                     role: 'user',
-                    content: `Leggi il seguente testo e generami esattamente 15 flashcard in formato JSON puro:
-
-                    ${text.substring(0, 5000)} // Limita la lunghezza del testo
-
-                    RISPOSTA OBBLIGATORIA IN QUESTO FORMATO, SENZA ALCUN TESTO AGGIUNTIVO:
-
-                    [
-                    {"question": "testo domanda 1", "answer": "testo risposta 1"},
-                    {"question": "testo domanda 2", "answer": "testo risposta 2"}
-                    ]
-
-                    REGOLE:
-                    1. MAX 10 flashcard
-                    2. Solo JSON valido
-                    3. Nessun testo prima o dopo
-                    4. Risposte brevi (max 20 parole)`}
+                    content: `Leggi il seguente testo e genera un massimo di 10 flashcard in formato JSON valido. Ogni flashcard deve avere una domanda e una risposta breve (massimo 20 parole). 
+                
+                Regole:
+                1. Rileva automaticamente la lingua del testo fornito.
+                2. Genera le flashcard nella stessa lingua del testo.
+                3. Rispondi esclusivamente con un array JSON valido.
+                4. Non includere testo aggiuntivo prima o dopo il JSON.
+                5. Ogni risposta deve essere breve e concisa.
+                6. Genera massimo 10 flashcard.
+        
+                Testo:
+                ${text.substring(0, 5000)}
+                
+                Formato richiesto (esempio in italiano):
+                [
+                    {"question": "Qual è la capitale della Francia?", "answer": "Parigi"},
+                    {"question": "Chi ha scritto 'Il Piccolo Principe'?", "answer": "Antoine de Saint-Exupéry"}
+                ]`
+                }
             ],
             max_completion_tokens: 3000,
             temperature: 0.7

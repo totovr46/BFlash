@@ -448,7 +448,7 @@
     const mode = urlParams.get('mode'); // Controlla se è "unknown"
 
     if (!currentDeckId) {
-        alert('ID mazzo mancante!');
+        alert('Deck ID missing!');
         window.location.href = 'index.html';
         return;
     }
@@ -469,8 +469,8 @@
 
         displayCard();
     } catch (error) {
-        console.error('Errore durante il caricamento delle flashcard:', error);
-        alert('Errore durante il caricamento delle flashcard.');
+        console.error('Error while loading flashcards:', error);
+        alert('Error while loading flashcards.');
     }
 });
 
@@ -482,11 +482,11 @@ async function loadDeckAndSetNames(deckId, setId) {
         });
 
         if (!deckResponse.ok) {
-            throw new Error('Errore nel caricamento del deck');
+            throw new Error('Error loading the deck');
         }
 
         const deck = await deckResponse.json();
-        document.getElementById('deck-name').textContent = deck.subject || 'Titolo non disponibile';
+        document.getElementById('deck-name').textContent = deck.subject || 'Title not available';
 
         // Recupera i dettagli del set solo se abbiamo un setId
         if (setId) {
@@ -495,19 +495,19 @@ async function loadDeckAndSetNames(deckId, setId) {
             });
 
             if (!setResponse.ok) {
-                throw new Error('Errore nel caricamento del set');
+                throw new Error('Error loading the set');
             }
 
             const set = await setResponse.json();
-            document.getElementById('set-name').textContent = set.name || 'Set non disponibile';
+            document.getElementById('set-name').textContent = set.name || 'Set not available';
         } else {
-            document.getElementById('set-name').textContent = 'Tutte le carte';
+            document.getElementById('set-name').textContent = 'All cards.';
         }
     } catch (error) {
-        console.error('Errore nel caricamento di deck o set:', error);
+        console.error('Error loading deck or set:', error);
         // Mostra valori di default in caso di errore
-        document.getElementById('deck-name').textContent = 'Deck non disponibile';
-        document.getElementById('set-name').textContent = 'Set non disponibile';
+        document.getElementById('deck-name').textContent = 'Deck not available';
+        document.getElementById('set-name').textContent = 'Set not available';
     }
 }
 
@@ -519,12 +519,12 @@ async function loadDeckAndSetNames(deckId, setId) {
                     }
                 });
 
-                if (!response.ok) throw new Error('Errore nel caricamento delle flashcard');
+                if (!response.ok) throw new Error('Error loading flashcards.');
 
                 currentCards = await response.json();
             } catch (error) {
-                console.error('Errore:', error);
-                alert('Errore nel caricamento delle flashcard.');
+                console.error('Error:', error);
+                alert('Error loading flashcards..');
             }
         }
 
@@ -541,13 +541,13 @@ async function loadDeckAndSetNames(deckId, setId) {
             headers: { 'x-auth-token': localStorage.getItem('token') }
         });
 
-        if (!response.ok) throw new Error('Errore nel caricamento delle flashcard per ripetizione');
+        if (!response.ok) throw new Error('Error loading flashcards. per ripetizione');
 
         currentCards = await response.json();
         currentIndex = 0;
         displayCard();
     } catch (error) {
-        console.error('Errore:', error);
+        console.error('Error:', error);
         alert('Error in loading cards in repetition mode.');
     }
 }
@@ -584,19 +584,19 @@ async function loadDeckAndSetNames(deckId, setId) {
         
                 currentCards = await response.json();
             } catch (error) {
-                console.error('Errore:', error);
-                alert('Errore nel caricamento delle flashcard del deck.');
+                console.error('Error:', error);
+                alert('Error loading deck flashcards. del deck.');
             }
         }
 
         function displayCard() {
             if (currentCards.length === 0) {
-                document.getElementById('flashcard-content-question').textContent = 'Nessuna flashcard disponibile.';
+                document.getElementById('flashcard-content-question').textContent = 'No flashcards available.';
                 document.getElementById('flashcard-content-answer').textContent = '';
                 document.getElementById('unknown-button').style.display = 'none';
                 document.getElementById('known-button').style.display = 'none';
-                document.getElementById('deck-name').textContent = 'Nessun deck';
-                document.getElementById('set-name').textContent = 'Nessun set';
+                document.getElementById('deck-name').textContent = 'No deck.';
+                document.getElementById('set-name').textContent = 'No set';
                 return;
             }
 
@@ -684,7 +684,7 @@ document.getElementById('known-button').addEventListener('click', async () => {
                     body: JSON.stringify({ known })
                 });
             } catch (error) {
-                console.error('Errore nell\'aggiornamento dello stato della flashcard:', error);
+                console.error('Error updating flashcard status:', error);
             }
         }
 
@@ -796,14 +796,14 @@ async function loadAllDeckRepetitionCards() {
             headers: { 'x-auth-token': localStorage.getItem('token') }
         });
 
-        if (!response.ok) throw new Error('Errore nel caricamento delle flashcard per ripetizione del deck');
+        if (!response.ok) throw new Error('Error loading deck flashcards.');
 
         currentCards = await response.json();
         currentIndex = 0;
         displayCard();
     } catch (error) {
-        console.error('Errore:', error);
-        alert('Errore nel caricamento delle flashcard per ripetizione del deck.');
+        console.error('Error:', error);
+        alert('Error loading deck flashcards.');
     }
 }
 
