@@ -119,7 +119,5 @@ Project Link: [https://github.com/totovr46/BFlash](https://github.com/totovr46/B
 
 ## 📸 Screenshots
 
-| Deck View | Set View | Study Mode | Stats View |
-|-----------|-----------|------------|
 |![Deck](arancione/client/foto/deck.png)|![Set](arancione/client/foto/set.png)|![Study](arancione/client/foto/study.png)||![Stats](arancione/client/foto/stats.png)
 
