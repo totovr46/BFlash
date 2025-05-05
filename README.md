@@ -1,202 +1,200 @@
 # BFlash - Flashcard App
 
-Demo a https://flashcard.musuhome.org
+ Available at https://bflash.org
 
-## Struttura del progetto
-- **Frontend**: HTML, CSS e JavaScript.
-- **Backend**: Node.js con Express per la gestione delle API REST.
-- **Database**: MongoDB per la persistenza dei dati.
+## Project Structure
+- **Frontend**: HTML, CSS, and JavaScript.
+- **Backend**: Node.js with Express for REST API management.
+- **Database**: MongoDB for data persistence.
 
-### Cartelle principali
-- `client/`: Contiene i file frontend, inclusi HTML, CSS e JavaScript.
-- `server/`: Contiene il backend, con modelli, middleware e route API.
-- `routes/`: Definisce le API per utenti, mazzi, set e flashcard.
-- `models/`: Modelli Mongoose per la gestione dei dati.
+### Main Directories
+- `client/`: Contains frontend files, including HTML, CSS, and JavaScript.
+- `server/`: Contains the backend, with models, middleware, and API routes.
+- `routes/`: Defines APIs for users, decks, sets, and flashcards.
+- `models/`: Mongoose models for data management.
 
-## Come iniziare
-1. Clona il repository:
+## Getting Started
+1. Clone the repository:
    ```bash
    git clone https://github.com/totovr46/BFlash.git   
    cd BFlash
    ```
-2. Installa le dipendenze:
+2. Install dependencies:
    ```bash
    cd arancione
    npm install
    ```
-3. Configura le variabili d'ambiente:  
-   Crea un file `.env` nella directory principale e aggiungi:  
+3. Configure environment variables:  
+   Create a `.env` file in the root directory and add:  
    ```
-   MONGODB_URI=<stringadachiedereatotò>
-   JWT_SECRET=<stringasegretadachiedereatotò>
+   MONGODB_URI=<ask_totò_for_this_string>
+   JWT_SECRET=<ask_totò_for_this_secret_string>
    PORT=5050
    ```
-4. Avvia il server:
+4. Start the server:
    ```bash
    npm start
    ```
-5. Apri il frontend:  
-   Visita http://localhost:5050.
+5. Open the frontend:  
+   Visit http://localhost:5050.
 
-
-## Spiegazione File Principali
+## Explanation of Key Files
 
 ### `.env`
-File che contiene variabili di ambiente sensibili come:
-- Credenziali del database
-- Secret key per la generazione di token JWT
-- URL del database
-- Altre configurazioni che non devono essere condivise pubblicamente
+File containing sensitive environment variables such as:
+- Database credentials
+- Secret key for JWT token generation
+- Database URL
+- Other configurations that should not be shared publicly
 
-*Nota: Questo file non viene caricato su Git per motivi di sicurezza. Chiederlo a totò quando necessario*
+*Note: This file is not uploaded to Git for security reasons. Ask salvatore musumeci when needed.*
 
 ### `.gitignore`
-Specifica quali file e cartelle Git deve ignorare durante il controllo delle versioni, tra cui:
-- `.env` (per non esporre dati sensibili)
-- `node_modules` (librerie installate, che occuperebbero troppo spazio)
+Specifies which files and folders Git should ignore during version control, including:
+- `.env` (to avoid exposing sensitive data)
+- `node_modules` (installed libraries, which would take up too much space)
 
 ### `package.json`
-File di configurazione del progetto Node.js che include:
-- Informazioni generali sul progetto (nome, versione, descrizione)
-- Elenco delle dipendenze necessarie
-- Script di avvio dell'applicazione (`start`, `dev`)
-- Altre configurazioni del progetto
+Node.js project configuration file that includes:
+- General project information (name, version, description)
+- List of required dependencies
+- Application startup scripts (`start`, `dev`)
+- Other project configurations
 
-## Cartella `client/` (Frontend)
+## `client/` Folder (Frontend)
 
-Contiene tutti i file relativi all'interfaccia utente dell'applicazione.
+Contains all files related to the application's user interface.
 
 ### `index.html`
-La pagina principale dell'applicazione che mostra:
-- Lista dei mazzi dell'utente 
-- Opzioni per creare nuovi mazzi
-- Menu di navigazione principale per raggiungere: stats.html, friends.html, settings.html
-- Sezione per accedere ai giochi
+The main page of the application, displaying:
+- User's deck list
+- Options to create new decks
+- Main navigation menu to access: stats.html, friends.html, settings.html
+- Section for accessing games
 
 ### `indexlight.html`
-Versione alternativa della pagina principale con tema chiaro, offrendo:
-- Le stesse funzionalità di `index.html`
-- Un'interfaccia con colori più chiari per chi preferisce questo stile visivo
+Alternative version of the main page with a light theme, offering:
+- The same functionality as `index.html`
+- An interface with lighter colors for those who prefer this visual style
 
 ### `login.html`
-Pagina di autenticazione degli utenti che permette:
-- Accesso con credenziali (email e password)
-- Registrazione di nuovi account
-- Eventualmente recupero password
+User authentication page that allows:
+- Login with credentials (email and password)
+- Registration of new accounts
+- Password recovery (if applicable)
 
 ### `deck.html`
-Pagina dedicata alla visualizzazione e gestione di un singolo mazzo, con funzioni per:
-- Visualizzare i set di flashcard contenuti nel mazzo
-- Aggiungere nuovi set al mazzo
-- Modificare o eliminare set esistenti
-- Modificare le informazioni del mazzo
+Page dedicated to viewing and managing a single deck, with functions to:
+- View the flashcard sets contained in the deck
+- Add new sets to the deck
+- Edit or delete existing sets
+- Modify deck information
 
 ### `set.html`
-Pagina per la gestione di un set specifico di flashcard, che offre:
-- Visualizzazione di tutte le flashcard del set
-- Aggiunta di nuove flashcard
-- Modifica o eliminazione di flashcard esistenti
-
+Page for managing a specific flashcard set, offering:
+- Display of all flashcards in the set
+- Adding new flashcards
+- Editing or deleting existing flashcards
 
 ### `style.css`
-File che definisce lo stile visivo dell'intera applicazione, gestendo:
-- Layout delle pagine
-- Colori, font e spaziature
-- Animazioni e transizioni
-- Adattamento a diverse dimensioni dello schermo (responsive design)
+File defining the visual style of the entire application, handling:
+- Page layouts
+- Colors, fonts, and spacing
+- Animations and transitions
+- Adaptation to different screen sizes (responsive design)
 
-## Cartella `server/` (Backend)
+## `server/` Folder (Backend)
 
-Contiene il codice che gestisce la logica dell'applicazione e le interazioni con il database.
+Contains the code that manages the application logic and database interactions.
 
 ### `app.js`
-File principale che configura il server Express, tra cui:
-- Importazione e configurazione dei middleware necessari
-- Collegamento alle route API
+Main file configuring the Express server, including:
+- Importing and configuring necessary middleware
+- Linking to API routes
 
 ### `server.js`
-File che avvia effettivamente il server, occupandosi di:
-- Connessione al database MongoDB
-- Avvio del server sulla porta specificata
-- Gestione degli eventi di avvio/spegnimento
+File that actually starts the server, handling:
+- Connection to the MongoDB database
+- Starting the server on the specified port
+- Managing startup/shutdown events
 
-### Sottocartella `middleware/`
+### `middleware/` Subfolder
 
 #### `auth.js`
-Middleware per la protezione delle API che:
-- Verifica la validità dei token JWT nelle richieste
-- Autorizza o blocca l'accesso alle risorse protette
-- Estrae le informazioni dell'utente dal token
+Middleware for API protection that:
+- Verifies the validity of JWT tokens in requests
+- Authorizes or blocks access to protected resources
+- Extracts user information from the token
 
-### Sottocartella `models/`
+### `models/` Subfolder
 
-Contiene gli schemi del database che definiscono la struttura dei dati.
+Contains database schemas defining the data structure.
 
 #### `User.js`
-Modello per gli utenti dell'applicazione, con campi come:
+Model for application users, with fields such as:
 - Username
 - Email
-- Password (criptata)
-- Data di registrazione
-- Riferimenti ai mazzi creati dall'utente
+- Password (encrypted)
+- Registration date
+- References to decks created by the user
 
 #### `Deck.js`
-Modello per i mazzi di flashcard, che include:
-- Nome/titolo del mazzo
-- Soggetto o materia
-- Riferimento all'utente proprietario
-- Lista dei set contenuti nel mazzo
-- Data di creazione e modifica
+Model for flashcard decks, including:
+- Deck name/title
+- Subject or topic
+- Reference to the owner user
+- List of sets contained in the deck
+- Creation and modification dates
 
 #### `Set.js`
-Modello per i set di flashcard all'interno di un mazzo, con:
-- Nome del set
-- Descrizione
-- Riferimento al mazzo a cui appartiene
-- Lista delle flashcard contenute
+Model for flashcard sets within a deck, with:
+- Set name
+- Description
+- Reference to the parent deck
+- List of contained flashcards
 
 #### `Card.js`
-Modello per le singole flashcard, contenente:
-- Contenuto del fronte (domanda)
-- Contenuto del retro (risposta)
-- Riferimenti al set e al mazzo di appartenenza
+Model for individual flashcards, containing:
+- Front content (question)
+- Back content (answer)
+- References to the parent set and deck
 
-### Sottocartella `routes/`
+### `routes/` Subfolder
 
-Contiene i file che definiscono le API REST per interagire con i dati.
+Contains files defining REST APIs to interact with data.
 
 #### `authRoutes.js`
-Gestisce le operazioni relative all'autenticazione:
-- Registrazione di nuovi utenti
-- Login e generazione di token JWT
+Handles authentication-related operations:
+- Registration of new users
+- Login and JWT token generation
 - Logout
-- Eventuale verifica email o recupero password
+- Email verification or password recovery (if applicable)
 
 #### `userRoutes.js`
-API per la gestione dei profili utente:
-- Recupero dei dati dell'utente
-- Aggiornamento delle informazioni del profilo
-- Eliminazione dell'account
-- Gestione delle preferenze
+APIs for user profile management:
+- Retrieving user data
+- Updating profile information
+- Account deletion
+- Preference management
 
 #### `deckRoutes.js`
-API per la gestione dei mazzi:
-- Creazione di nuovi mazzi
-- Recupero della lista dei mazzi dell'utente
-- Modifica delle informazioni di un mazzo
-- Eliminazione di mazzi
+APIs for deck management:
+- Creating new decks
+- Retrieving the user's deck list
+- Modifying deck information
+- Deleting decks
 
 #### `setRoutes.js`
-API per la gestione dei set all'interno dei mazzi:
-- Creazione di nuovi set
-- Recupero dei set di un mazzo
-- Modifica delle informazioni di un set
-- Eliminazione di set
+APIs for managing sets within decks:
+- Creating new sets
+- Retrieving sets in a deck
+- Modifying set information
+- Deleting sets
 
 #### `cardRoutes.js`
-API per la gestione delle flashcard:
-- Creazione di nuove flashcard
-- Recupero delle flashcard di un set
-- Modifica del contenuto delle flashcard
-- Eliminazione di flashcard
-- Aggiornamento dei dati di studio
+APIs for flashcard management:
+- Creating new flashcards
+- Retrieving flashcards in a set
+- Modifying flashcard content
+- Deleting flashcards
+- Updating study data
