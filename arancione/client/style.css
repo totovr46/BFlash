@@ -1,29 +1,56 @@
-
+        /* Define colors using CSS variables */
         :root {
-            --primary: #f8b678;
-            --primary-light: #61493a;
-            --text: #e0e0e0;
-            --background: #121212;
-            --gray-light: #1e1e1e;
-            --gray: #2d2d2d;
-            --card-background: #2e2d2d;
-            --sidebar-hover: #2c2318;
-            --shadow-color: rgba(0, 0, 0, 0.3);
+            /* Dark Theme Colors (Default) */
+            --primary: #f8b678;         /* Example Orange */
+            --primary-light: #61493a;   /* Example Darker accent for dark mode */
+            --primary-dark: #e68900; /* Example Darker primary for hover */
+            --text: #e0e0e0;            /* Light text */
+            --text-light: #999999;     /* Lighter grey text */
+            --background: #121212;      /* Very dark background */
+            --gray-light: #1e1e1e;      /* Slightly lighter dark background */
+            --gray: #2d2d2d;            /* Medium dark grey */
+            --card-background: #2e2d2d; /* Dark card background */
+            --sidebar-hover: #2c2318;   /* Dark hover */
+            --shadow-color: rgba(0, 0, 0, 0.5); /* Darker shadow */
+            --success: #28a745; /* Green for success */
+            --danger: #dc3545; /* Red for danger/delete */
         }
-        
+
+        /* Define overrides for Light Theme */
+        html.light-mode { /* Apply this class to body to switch */
+            --primary: #f8b678;         /* Keep Orange */
+            --primary-light: #fff0e3;   /* Light accent for light mode */
+            --primary-dark: #e68900;
+            --text: #333333;            /* Dark text */
+            --text-light: #666666;     /* Lighter dark text */
+            --background: #ffffff;      /* White background */
+            --gray-light: #f5f5f5;      /* Very light grey */
+            --gray: #e0e0e0;            /* Medium light grey */
+            --card-background: #ffffff; /* White card background */
+            --sidebar-hover: #fff0e3;   /* Light hover */
+            --shadow-color: rgba(0, 0, 0, 0.1); /* Lighter shadow */
+            --success: #28a745;
+            --danger: #dc3545;
+}
+
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
         }
-        
+
         body {
+            background-color: var(--background);
+            color: var(--text);
+            /* Ensure smooth transition between themes */
+            transition: background-color 0.3s ease, color 0.3s ease;
+            /* Other base body styles */
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            color: var(--text);
-            background-color: var(--background);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
         }
         
         /* Header Styles */
@@ -134,6 +161,8 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
+            color: var(--text); /* Set text color explicitly */
+            text-decoration: none; /* Remove underline from links */
         }
         
         .sidebar-button:hover {
@@ -327,6 +356,116 @@
             transform: translateY(-2px);
         }
         
+
+        /* Add space below the main "Settings" H1 title */
+        .settings-container h1 {
+            margin-bottom: 40px; /* Adjust value (e.g., 30px, 50px) as needed */
+            /* text-align: center; Optional: center the main title */
+        }
+
+        /* Add space below the "Appearance" H2 title (applies to all H2s in sections) */
+        .settings-section h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 30px; /* Increased default space below ALL section titles */
+            color: var(--primary);
+        }
+
+        /* Specific space adjustment below the "Danger Zone" H2 title */
+        .danger-zone h2 {
+            color: var(--danger);
+            margin-bottom: 25px; /* Adjust value specifically for the danger zone title */
+        }
+        
+        /* Legal Part
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1001; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
+            /* Add fade-in effect */
+            animation-name: fadeIn;
+            animation-duration: 0.4s
+        }
+
+        /* Modal Content Box */
+        .modal-content {
+            position: relative;
+            background-color: var(--card-background); /* Use theme variable */
+            margin: 10% auto; /* 10% from the top and centered */
+            padding: 30px;
+            border: 1px solid var(--gray);
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 700px; /* Max width */
+            border-radius: 16px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            color: var(--text); /* Use theme variable */
+            /* Add animation */
+            animation-name: slideIn;
+            animation-duration: 0.4s
+        }
+
+        /* Modal specific for legal text */
+        .legal-modal .modal-body {
+            max-height: 60vh; /* Limit height and make scrollable */
+            overflow-y: auto; /* Add vertical scrollbar if content overflows */
+            margin-top: 20px;
+            padding-right: 15px; /* Space for scrollbar */
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        .legal-modal h2 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        .legal-modal p, .legal-modal li {
+            margin-bottom: 12px;
+        }
+        .legal-modal strong {
+            font-weight: 600;
+            color: var(--text); /* Ensure strong text is readable */
+        }
+        .legal-modal ul {
+            list-style: disc;
+            margin-left: 20px;
+        }
+
+
+        /* The Close Button */
+        .close-modal {
+            color: var(--text-light);
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: var(--primary); /* Use primary color on hover */
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Modal Animations */
+        @keyframes slideIn {
+        from {top: -300px; opacity: 0}
+        to {top: 0; opacity: 1} /* Adjust 'top: 0' if margin calculation is different */
+        }
+
+        @keyframes fadeIn {
+        from {opacity: 0}
+        to {opacity: 1}
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .main-container {

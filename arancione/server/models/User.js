@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 6
+    minlength: 6,
+    //select: false // Prevents the password hash from being returned by default in queries --> suggested by AI but creates bugs
   },
   googleId: {
     type: String,
@@ -56,5 +57,16 @@ userSchema.pre('save', async function(next) {
     next(err);
   }
 });
+
+// Method to compare entered password with the hashed password in the database
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  // 'this.password' refers to the password hash of the user document this method is called on.
+  // Need to ensure the password was selected when fetching the user for this to work.
+  if (!this.password) {
+      // This might happen if the password field wasn't selected or doesn't exist (e.g., OAuth user)
+      return false;
+  }
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 module.exports = mongoose.model('User', userSchema);
