@@ -3,8 +3,7 @@
 
 BFlash is a web application for creating and managing flashcards that helps students learn through spaced repetition.
 
-![Flashcard App](https://bflash.org/preview.png)
-
+![Flashcard App](https://raw.githubusercontent.com/totovr46/TUO_REPO/BFlash/arancione/client/preview.png)
 ## 🌟 Features
 
 - **Deck Management**: Organize flashcards into thematic decks
