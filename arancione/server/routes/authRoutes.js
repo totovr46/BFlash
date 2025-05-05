@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const User = require('../models/User');
 const router = express.Router();
+const { calculateAndUpdateStreak } = require('../utils/streakUtils');
 
 // Registrazione
 router.post('/register', async (req, res) => {
@@ -85,8 +86,8 @@ router.post('/login', async (req, res) => {
     }
 
     // --- Calculate and Update Streak ---
-    await calculateAndUpdateStreak(user.id);
-    // --- End Streak Logic ---
+    const streak = await calculateAndUpdateStreak(user.id);
+  // --- End Streak Logic ---
 
     // Generate JWT
     const payload = { user: { id: user.id } };
@@ -135,7 +136,7 @@ router.get('/google/callback',
 
     try {
         // --- Calculate and Update Streak ---
-        await calculateAndUpdateStreak(req.user.id);
+        const streak = await calculateAndUpdateStreak(req.user.id);
         // --- End Streak Logic ---
 
         // Generate JWT
