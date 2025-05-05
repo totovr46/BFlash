@@ -1,9 +1,12 @@
 
 # BFlash 🗃️
 
+## 🌐 Demo
+Try BFlash : [https://bflash.org](https://bflash.org)
+
 BFlash is a web application for creating and managing flashcards that helps students learn through spaced repetition.
 
-![Flashcard App](arancione/client/preview.png)
+![Flashcard App](arancione/client/foto/preview.png)
 ## 🌟 Features
 
 - **Deck Management**: Organize flashcards into thematic decks
@@ -112,3 +115,11 @@ Project Link: [https://github.com/totovr46/BFlash](https://github.com/totovr46/B
 - [Chart.js](https://www.chartjs.org)
 - [Express](https://expressjs.com)
 - [MongoDB](https://www.mongodb.com)
+
+
+## 📸 Screenshots
+
+| Home Page | Deck View | Study Mode |
+|-----------|-----------|------------|
+|![Home](arancione/client/foto/home.png)|![Deck](arancione/client/foto/deck.png)|![Study](arancione/client/foto/study.png)|
+
