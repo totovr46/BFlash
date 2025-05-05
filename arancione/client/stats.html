@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stats - Bflash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        (function() {
+          function applyTheme(theme) {
+            document.documentElement.classList.toggle('light-mode', theme === 'light');
+          }
+          const savedTheme = localStorage.getItem('themeMode') || 'dark';
+          applyTheme(savedTheme);
+          if (!localStorage.getItem('themeMode')) localStorage.setItem('themeMode', 'dark');
+        })();
+      </script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Specific styles for stats.html */
+
+        /* Remove styles related to .stats-page-container and .stats-sidebar if they were added */
+
+        .stats-content {
+            /* Removed flex-grow: 1; */
+            background-color: var(--gray-light);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px auto; /* Center the content area, add margin */
+            max-width: 900px; /* Limit width */
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .stats-content h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--primary);
+            text-align: center; /* Center title */
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjusted minmax */
+            gap: 20px; /* Slightly reduced gap */
+            margin-bottom: 40px;
+        }
+
+        .stat-box {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            transition: transform 0.2s ease;
+        }
+        .stat-box:hover {
+             transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+        .chart-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        #knowledgeChart {
+             max-height: 300px; /* Limit chart height */
+             width: 100% !important; /* Ensure chart takes container width */
+        }
+
+        /* Learning Walk Styles */
+        .walk-section {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+        .walk-section h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .walk-container {
+            position: relative;
+            height: 80px; /* Adjust height as needed */
+            background: linear-gradient(to right, var(--gray), var(--gray-light)); /* Simple path background */
+            border-radius: 40px;
+            margin: 0 auto;
+            max-width: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: space-around; /* Distribute steps evenly */
+            padding: 0 20px;
+        }
+
+        .walk-step {
+            position: relative; /* Needed for absolute positioning of tooltip */
+            width: 40px;
+            height: 40px;
+            background-color: var(--gray);
+            border: 3px solid var(--text-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 16px;
+            transition: all 0.4s ease;
+            cursor: default; /* Indicate it's not clickable unless you add interaction */
+        }
+
+        .walk-step.completed {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--background);
+            transform: scale(1.1);
+        }
+        .walk-step .tooltip {
+            visibility: hidden;
+            width: 120px;
+            background-color: var(--primary-light);
+            color: var(--text);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the step */
+            left: 50%;
+            margin-left: -60px; /* Center the tooltip */
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+         .walk-step:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .walk-step .tooltip::after { /* Tooltip arrow */
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--primary-light) transparent transparent transparent;
+        }
+
+
+        /* Achievements Styles */
+        .achievements-section {
+            /* Similar styling to walk-section */
+            background-color: var(--card-background);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+         .achievements-section h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 20px;
+            justify-items: center;
+        }
+        .achievement-badge {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: var(--gray);
+            display: flex;
+            flex-direction: column; /* Stack icon and tooltip */
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: default;
+            opacity: 0.5; /* Dim locked badges */
+            filter: grayscale(80%);
+            transition: all 0.3s ease;
+        }
+         .achievement-badge.unlocked {
+            opacity: 1;
+            filter: grayscale(0%);
+            background-color: var(--primary-light); /* Use a light accent color */
+            border: 2px solid var(--primary);
+        }
+         .achievement-badge i {
+            font-size: 28px;
+            color: var(--text-light);
+            margin-bottom: 5px; /* Space for tooltip if needed */
+        }
+         .achievement-badge.unlocked i {
+             color: var(--primary);
+        }
+        .achievement-badge .tooltip {
+            /* Similar tooltip style as walk steps */
+            visibility: hidden;
+            width: 140px;
+            background-color: var(--primary-light);
+            color: var(--text);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 110%;
+            left: 50%;
+            margin-left: -70px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+        .achievement-badge:hover .tooltip {
+             visibility: visible;
+             opacity: 1;
+         }
+        .achievement-badge .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--primary-light) transparent transparent transparent;
+        }
+
+        /* Loading / Error Placeholder Styles */
+        #stats-placeholder {
+             text-align: center;
+             padding: 50px;
+             color: var(--text-light);
+             font-size: 16px;
+             border-radius: 12px;
+             background-color: var(--card-background);
+             margin-top: 30px;
+         }
+        #stats-placeholder i {
+             font-size: 24px;
+             display: block;
+             margin-bottom: 10px;
+             color: var(--primary);
+         }
+         #stats-placeholder .error-stats i {
+              color: var(--danger);
+         }
+
+
+        /* Responsive Adjustments */
+         @media (max-width: 768px) {
+             .stats-content {
+                 padding: 20px;
+                 margin: 15px;
+             }
+             .stats-grid {
+                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adjust for smaller screens */
+                 gap: 15px;
+             }
+             .walk-container {
+                  height: 60px;
+                  padding: 0 10px;
+             }
+             .walk-step {
+                 width: 30px;
+                 height: 30px;
+                 font-size: 14px;
+                 border-width: 2px;
+             }
+             .achievements-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); /* Smaller badges */
+                 gap: 15px;
+             }
+              .achievement-badge {
+                 width: 60px;
+                 height: 60px;
+             }
+              .achievement-badge i {
+                 font-size: 24px;
+             }
+         }
+
+         @media (max-width: 480px) {
+             .stats-grid {
+                 grid-template-columns: 1fr 1fr; /* Two columns on very small screens */
+             }
+              .stat-value {
+                  font-size: 24px;
+              }
+              .stat-label {
+                  font-size: 12px;
+              }
+              .achievements-grid {
+                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); /* Even smaller badges */
+                 gap: 10px;
+             }
+               .achievement-badge {
+                 width: 50px;
+                 height: 50px;
+             }
+              .achievement-badge i {
+                 font-size: 20px;
+             }
+         }
+
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo-link" style="text-decoration: none; color: inherit;">
+            <div class="logo">
+                <div class="logo-circle">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="app-name">Bflash</div>
+            </div>
+        </a>
+        <div class="search-profile">
+            <div class="crown">
+                <i class="fas fa-crown"></i>
+            </div>
+            <div class="profile-icon" id="profile-menu-button">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="profile-dropdown" id="profile-dropdown" style="display: none;">
+                <div class="dropdown-item" id="username-display">Username</div>
+                <div class="dropdown-item" id="logout-button">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="stats-content" id="stats-content-area">
+        <h1>Your Learning Statistics</h1>
+
+        <div id="stats-data-container" style="display: none;"> <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+                    <div class="stat-value" id="stat-total-decks">--</div>
+                    <div class="stat-label">Total Decks</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon"><i class="fas fa-list"></i></div>
+                    <div class="stat-value" id="stat-total-sets">--</div>
+                    <div class="stat-label">Total Sets</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon"><i class="fas fa-clone"></i></div>
+                    <div class="stat-value" id="stat-total-cards">--</div>
+                    <div class="stat-label">Total Cards</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                    <div class="stat-value" id="stat-current-streak">--</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+                 <div class="stat-box">
+                    <div class="stat-icon"><i class="fas fa-check-circle" style="color: var(--success);"></i></div>
+                    <div class="stat-value" id="stat-known-cards">--</div>
+                    <div class="stat-label">Known Cards</div>
+                </div>
+                 <div class="stat-box">
+                    <div class="stat-icon"><i class="fas fa-times-circle" style="color: var(--danger);"></i></div>
+                    <div class="stat-value" id="stat-unknown-cards">--</div>
+                    <div class="stat-label">Unknown Cards</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                 <h2>Knowledge Distribution</h2>
+                <canvas id="knowledgeChart"></canvas>
+            </div>
+
+            <div class="walk-section">
+                <h2>The Learning Walk</h2>
+                <div class="walk-container" id="walk-container">
+                    <div class="walk-step" id="walk-step-1">
+                         <i class="fas fa-flag-checkered"></i> <span class="tooltip">Start Your Journey!</span>
+                     </div>
+                     <div class="walk-step" id="walk-step-2">
+                         <i class="fas fa-star"></i>
+                         <span class="tooltip">Learn 10 Cards</span>
+                     </div>
+                     <div class="walk-step" id="walk-step-3">
+                          <i class="fas fa-layer-group"></i>
+                          <span class="tooltip">Create 1 Deck</span>
+                     </div>
+                     <div class="walk-step" id="walk-step-4">
+                        <i class="fas fa-fire"></i>
+                        <span class="tooltip">3 Day Streak</span>
+                     </div>
+                     <div class="walk-step" id="walk-step-5">
+                         <i class="fas fa-medal"></i>
+                          <span class="tooltip">Learn 50 Cards</span>
+                     </div>
+                    </div>
+            </div>
+
+            <div class="achievements-section">
+                <h2>Achievements</h2>
+                <div class="achievements-grid" id="achievements-grid">
+                     <div class="achievement-badge" id="achieve-create-deck">
+                         <i class="fas fa-plus-square"></i>
+                         <span class="tooltip">Deck Creator: Create your first deck.</span>
+                    </div>
+                     <div class="achievement-badge" id="achieve-learn-10">
+                         <i class="fas fa-graduation-cap"></i>
+                         <span class="tooltip">Quick Learner: Learn 10 cards.</span>
+                    </div>
+                     <div class="achievement-badge" id="achieve-learn-100">
+                         <i class="fas fa-brain"></i>
+                         <span class="tooltip">Knowledge Seeker: Learn 100 cards.</span>
+                    </div>
+                    <div class="achievement-badge" id="achieve-streak-7">
+                         <i class="fas fa-calendar-check"></i>
+                         <span class="tooltip">Consistent Learner: 7-day streak.</span>
+                    </div>
+                     <div class="achievement-badge" id="achieve-master-set">
+                         <i class="fas fa-trophy"></i>
+                          <span class="tooltip">Set Master: Mark all cards in a set as known. (Requires >5 cards)</span>
+                    </div>
+                    <div class="achievement-badge" id="achieve-create-deck">
+                        <i class="fas fa-plus-square"></i>
+                        <span class="tooltip">Deck Creator: Create your first deck.</span>
+                   </div>
+                    <div class="achievement-badge" id="achieve-learn-10">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span class="tooltip">Quick Learner: Learn 10 cards.</span>
+                   </div>
+                    <div class="achievement-badge" id="achieve-learn-100">
+                        <i class="fas fa-brain"></i>
+                        <span class="tooltip">Knowledge Seeker: Learn 100 cards.</span>
+                   </div>
+                   <div class="achievement-badge" id="achieve-streak-7">
+                        <i class="fas fa-calendar-check"></i>
+                        <span class="tooltip">Consistent Learner: 7-day streak.</span>
+                   </div>
+                    <div class="achievement-badge" id="achieve-master-set">
+                        <i class="fas fa-trophy"></i>
+                         <span class="tooltip">Set Master: Master 1 set (all cards known in a set with 5+ cards).</span>
+                   </div>
+
+                   <div class="achievement-badge" id="achieve-deck-5">
+                        <i class="fas fa-layer-group"></i>
+                        <span class="tooltip">Deck Builder: Create 5 decks.</span>
+                   </div>
+                   <div class="achievement-badge" id="achieve-set-25">
+                        <i class="fas fa-list-ol"></i>
+                        <span class="tooltip">Set Organizer: Create 25 sets.</span>
+                   </div>
+                    <div class="achievement-badge" id="achieve-card-250">
+                        <i class="fas fa-clone"></i>
+                        <span class="tooltip">Card Enthusiast: Create 250 cards.</span>
+                   </div>
+                    <div class="achievement-badge" id="achieve-learn-250">
+                        <i class="fas fa-book-reader"></i>
+                        <span class="tooltip">Adept Learner: Learn 250 cards.</span>
+                   </div>
+                    <div class="achievement-badge" id="achieve-streak-14">
+                        <i class="fas fa-fire-alt"></i>
+                        <span class="tooltip">Fiery Focus: Reach a 14-day streak.</span>
+                   </div>
+                    <div class="achievement-badge" id="achieve-master-3">
+                        <i class="fas fa-crown"></i>
+                        <span class="tooltip">Set Connoisseur: Master 3 sets.</span>
+                   </div>
+                     </div>
+            </div>
+        </div> <div id="stats-placeholder">
+             <div class="loading-stats"><i class="fas fa-spinner fa-spin"></i>Loading your stats...</div>
+        </div>
+
+    </div> <script>
+        const API_URL = '/api';
+        let knowledgeChartInstance = null; // To hold the chart object
+
+        // Check auth and load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            loadUserProfile(); // Load header info
+            setupCommonEventListeners(); // Setup header dropdown, logout
+
+            // Only attempt to load data once the backend is ready
+            // For now, we can show placeholder elements or a "coming soon" message
+            // Or, you can uncomment the line below once the backend is done.
+            loadStatsData(); // Fetch and render stats
+
+            // // --- TEMPORARY ---
+            // // Show a placeholder message until backend is ready
+            // showPlaceholderMessage("Statistics data loading is disabled until the backend is implemented.");
+            // // --- END TEMPORARY ---
+        });
+
+        // Load user info for header
+        function loadUserProfile() {
+             const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+             if (storedUser.username) {
+                 document.getElementById('username-display').textContent = storedUser.username;
+             }
+        }
+
+        // Setup header dropdown and logout
+        function setupCommonEventListeners() {
+            const profileButton = document.getElementById('profile-menu-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            const logoutButton = document.getElementById('logout-button');
+
+            if (profileButton && profileDropdown) {
+                profileButton.addEventListener('click', () => {
+                    profileDropdown.style.display = profileDropdown.style.display === 'none' ? 'block' : 'none';
+                });
+                document.addEventListener('click', (e) => {
+                    if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+                        profileDropdown.style.display = 'none';
+                    }
+                });
+            }
+
+            if (logoutButton) {
+                 logoutButton.addEventListener('click', () => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = 'login.html';
+                });
+            }
+        }
+
+        // Show loading state
+        function showLoading() {
+            const placeholder = document.getElementById('stats-placeholder');
+            const dataContainer = document.getElementById('stats-data-container');
+            placeholder.innerHTML = `<div class="loading-stats"><i class="fas fa-spinner fa-spin"></i>Loading your stats...</div>`;
+            placeholder.style.display = 'block';
+            dataContainer.style.display = 'none';
+        }
+
+        // Show error state
+        function showError(message = 'Could not load statistics.') {
+             const placeholder = document.getElementById('stats-placeholder');
+             const dataContainer = document.getElementById('stats-data-container');
+             placeholder.innerHTML = `<div class="error-stats"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
+             placeholder.style.display = 'block';
+             dataContainer.style.display = 'none';
+        }
+
+         // --- TEMPORARY FUNCTION ---
+         function showPlaceholderMessage(message) {
+             const placeholder = document.getElementById('stats-placeholder');
+             const dataContainer = document.getElementById('stats-data-container');
+             // Use similar styling to loading/error for consistency
+             placeholder.innerHTML = `<div class="loading-stats"><i class="fas fa-info-circle"></i> ${message}</div>`;
+             placeholder.style.display = 'block';
+             dataContainer.style.display = 'none';
+         }
+         // --- END TEMPORARY FUNCTION ---
+
+        // Hide loading/error and show data
+        function showData() {
+            document.getElementById('stats-placeholder').style.display = 'none';
+            document.getElementById('stats-data-container').style.display = 'block';
+        }
+
+
+        // Fetch stats data from backend
+        async function loadStatsData() {
+            showLoading(); // Show loading indicator
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/users/me/stats`, {
+                    headers: { 'x-auth-token': token }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) { // Unauthorized
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        window.location.href = 'login.html';
+                        return; // Stop execution
+                    }
+                     // Try to get error message from backend response
+                    let errorMsg = `Failed to load stats (Status: ${response.status})`;
+                    try {
+                        const errorData = await response.json();
+                        errorMsg = errorData.message || errorMsg;
+                    } catch (e) { /* Ignore parsing error if response isn't JSON */ }
+                    throw new Error(errorMsg);
+                }
+
+                const stats = await response.json();
+                renderStats(stats); // Render the data
+                showData(); // Show the data container
+
+            } catch (error) {
+                console.error("Error loading stats:", error);
+                showError(error.message); // Display error message
+            }
+        }
+
+        // Render the fetched stats onto the page
+        function renderStats(stats) {
+            // --- 1. Update Simple Stat Boxes ---
+            document.getElementById('stat-total-decks').textContent = stats.totalDecks ?? '--';
+            document.getElementById('stat-total-sets').textContent = stats.totalSets ?? '--';
+            document.getElementById('stat-total-cards').textContent = stats.totalCards ?? '--';
+            document.getElementById('stat-current-streak').textContent = stats.currentStreak ?? '--';
+            document.getElementById('stat-known-cards').textContent = stats.knownCards ?? '--';
+            document.getElementById('stat-unknown-cards').textContent = stats.unknownCards ?? '--';
+
+            // --- 2. Update Knowledge Distribution Chart ---
+            const ctx = document.getElementById('knowledgeChart').getContext('2d');
+            const known = stats.knownCards || 0;
+            const unknown = stats.unknownCards || 0;
+
+            // Destroy previous chart instance if it exists
+            if (knowledgeChartInstance) {
+                knowledgeChartInstance.destroy();
+            }
+
+            // Only create chart if there are cards
+            if (known + unknown > 0) {
+                 const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+                 knowledgeChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Known Cards', 'Unknown Cards'],
+                        datasets: [{
+                            label: 'Card Knowledge',
+                            data: [known, unknown],
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.7)', // Muted Success Green
+                                'rgba(255, 99, 132, 0.7)'  // Muted Danger Red
+                            ],
+                             borderColor: [
+                                 'rgba(75, 192, 192, 1)',
+                                 'rgba(255, 99, 132, 1)'
+                             ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                         plugins: {
+                             legend: {
+                                 position: 'bottom',
+                                 labels: { color: textColor } // Use theme text color
+                             },
+                             tooltip: {
+                                 bodyColor: textColor, // Adjust tooltip text color
+                                 titleColor: textColor
+                             }
+                         }
+                    }
+                });
+            } else {
+                 // Optional: Display a message if no cards exist
+                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                 ctx.textAlign = 'center';
+                 ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-light').trim();
+                 ctx.fillText('No card data available for chart.', ctx.canvas.width / 2, ctx.canvas.height / 2);
+             }
+
+
+            // --- 3. Update "Learning Walk" ---
+             const walkSteps = {
+                 'walk-step-1': true, // Start is always completed
+                 'walk-step-2': (stats.knownCards || 0) >= 10,
+                 'walk-step-3': (stats.totalDecks || 0) >= 1,
+                 'walk-step-4': (stats.currentStreak || 0) >= 3,
+                 'walk-step-5': (stats.knownCards || 0) >= 50
+             };
+             for (const [stepId, isCompleted] of Object.entries(walkSteps)) {
+                 const stepElement = document.getElementById(stepId);
+                 if (stepElement) {
+                     stepElement.classList.toggle('completed', isCompleted);
+                 }
+             }
+
+            // --- 4. Update Achievements ---
+            const achievements = {
+                // Existing
+                'achieve-create-deck': (stats.totalDecks || 0) >= 1,
+                'achieve-learn-10': (stats.knownCards || 0) >= 10,
+                'achieve-learn-100': (stats.knownCards || 0) >= 100,
+                'achieve-streak-7': (stats.currentStreak || 0) >= 7,
+                'achieve-master-set': (stats.masteredSetsCount || 0) >= 1,
+                // New (excluding profile one)
+                'achieve-deck-5': (stats.totalDecks || 0) >= 5,
+                'achieve-set-25': (stats.totalSets || 0) >= 25,
+                'achieve-card-250': (stats.totalCards || 0) >= 250,
+                'achieve-learn-250': (stats.knownCards || 0) >= 250,
+                'achieve-streak-14': (stats.currentStreak || 0) >= 14,
+                'achieve-master-3': (stats.masteredSetsCount || 0) >= 3
+            };
+             for (const [achieveId, isUnlocked] of Object.entries(achievements)) {
+                  const achieveElement = document.getElementById(achieveId);
+                  if (achieveElement) {
+                      achieveElement.classList.toggle('unlocked', isUnlocked);
+                  }
+             }
+        }
+
+    </script>
+</body>
+</html>
