@@ -3,9 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
-const app = require('./app'); // Importa l'app configurata
+const app = require('./app');
 
-// Carica le variabili d'ambiente dal file .env
 dotenv.config();
 
 // Middleware
@@ -23,26 +22,29 @@ const connectDB = async () => {
   }
 };
 
-// Inizializza connessione DB
 connectDB();
 
-// Definisci le routes
+// Routes API
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/decks', require('./routes/deckRoutes'));
-// app.use('/api/cards', require('./routes/cardRoutes')); // Rimuovi o commenta questa linea
-app.use('/api/sets', require('./routes/setRoutes')); // Questa rimane come è
-app.use('/api/sets', require('./routes/cardRoutes')); // Aggiungi questa linea
+app.use('/api/sets', require('./routes/setRoutes'));
+app.use('/api/sets', require('./routes/cardRoutes'));
 app.use('/api/flashcards', require('./routes/flashcardRoutes'));
-// Servi contenuti statici dalla cartella client
-app.use(express.static(path.join(__dirname, '../client')));
 
-// Per gestire il routing lato client (SPA)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/index.html'));
-});
+// Servi file statici solo in sviluppo
+if (process.env.NODE_ENV !== 'production') {
+  app.use(express.static(path.join(__dirname, '../client')));
+  
+  // Routing lato client solo in sviluppo
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/index.html'));
+  });
+  console.log('Modalità sviluppo: Node.js serve file statici');
+} else {
+  console.log('Modalità produzione: i file statici devono essere serviti da un web server (Apache/Nginx)');
+}
 
-// Definisci porta e avvia il server
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => {
   console.log(`Server in esecuzione sulla porta ${PORT}`);

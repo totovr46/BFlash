@@ -2,3 +2,4 @@ arancione/.env
 arancione/node_modules/
 .DS_Store
 arancione/.DS_Store
+arancione/server/ecosystem.config.js

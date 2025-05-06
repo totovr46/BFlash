@@ -9,7 +9,6 @@ const authRoutes = require('./routes/authRoutes');
 const cardRoutes = require('./routes/cardRoutes');
 const setRoutes = require('./routes/setRoutes'); 
 const searchRoutes = require('./routes/searchRoutes');
-
 require('./config/passport'); // Importa la configurazione di Passport
 
 
