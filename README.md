@@ -105,7 +105,7 @@ arancione/
 ## 📧 Contact
 
 Salvatore Musumeci - salvatore.musumeci@studbocconi.it
-Lorenzo Galluzzi - lorezo.galluzzi@studbocconi.it
+Lorenzo Galluzzi - lorenzo.galluzzi@studbocconi.it
 
 Project Link: [https://github.com/totovr46/BFlash](https://github.com/totovr46/BFlash)
 
