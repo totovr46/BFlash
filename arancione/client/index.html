@@ -223,6 +223,10 @@
         </form>
     </div>
 </div>
+<div class="toast-notification" id="toast">
+    <i class="fas fa-wand-magic-sparkles toast-icon"></i>
+    <span>This feature is coming soon! Stay tuned for more magic ✨</span>
+</div>
 
     <style>
         /* Loading */
@@ -509,7 +513,34 @@
         position: relative;  /* Aggiungi questa proprietà */
     }
 
+    /* Toast notification */
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--card-background);
+    color: var(--text);
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+}
 
+.toast-notification.show {
+    opacity: 1;
+}
+
+.toast-icon {
+    color: var(--primary);
+    font-size: 20px;
+}
     </style>
 
     <script>
@@ -961,6 +992,19 @@ async function editDeck(deckId, currentSubject, currentDescription, currentColor
                 if (event.target === editDeckModal) {
                     editDeckModal.style.display = 'none';
                 }
+            });
+
+            // Game icons click handler
+            document.querySelectorAll('.game-icon').forEach(game => {
+                game.addEventListener('click', function() {
+                    const toast = document.getElementById('toast');
+                    toast.classList.add('show');
+                    
+                    // Hide toast after 3 seconds
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                    }, 3000);
+                });
             });
         }
 
