@@ -66,6 +66,7 @@ arancione/
 │   ├── flashcard.html# study page
 │   ├── set.html      # Set management
 │   ├── stats.html    # User statistics
+│   ├── friends.html  # Friends management
 │   └── style.css     # Global styles
 ├── server/           # Backend files
 │   ├── models/       # Database models
