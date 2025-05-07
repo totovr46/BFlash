@@ -9,6 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const cardRoutes = require('./routes/cardRoutes');
 const setRoutes = require('./routes/setRoutes'); 
 const searchRoutes = require('./routes/searchRoutes');
+const friendRoutes = require('./routes/friendRoutes');
 require('./config/passport'); // Importa la configurazione di Passport
 
 
@@ -35,6 +36,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cards', cardRoutes);
 app.use('/api/sets', setRoutes); 
 app.use('/api/search', searchRoutes);
+app.use('/api/friends', friendRoutes);
+
 
 
 // Test route

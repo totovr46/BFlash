@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bflash - Friends</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        (function() {
+          // Function to apply the theme
+          function applyTheme(theme) {
+            if (theme === 'light') {
+              document.documentElement.classList.add('light-mode');
+            } else {
+              document.documentElement.classList.remove('light-mode');
+            }
+          }
+      
+          // Check localStorage for saved theme preference
+          const savedTheme = localStorage.getItem('themeMode');
+      
+          if (savedTheme) {
+            applyTheme(savedTheme);
+          } else {
+            localStorage.setItem('themeMode', 'dark');
+          }
+        })();
+      </script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Friends-specific styles */
+        .friends-container {
+            margin-top: 20px;
+        }
+        
+        .friends-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .friends-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .add-friend-button {
+            background-color: var(--primary);
+            color: var(--background);
+            border: none;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .add-friend-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .friends-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .friends-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-light);
+            position: relative;
+        }
+        
+        .friends-tab.active {
+            color: var(--primary);
+        }
+        
+        .friends-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+        
+        .friends-list {
+            display: grid;
+            gap: 16px;
+        }
+        
+        .friend-card {
+            background-color: var(--card-background);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+        
+        .friend-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        
+        .friend-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .friend-info {
+            flex: 1;
+        }
+        
+        .friend-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+        
+        .friend-stats {
+            font-size: 13px;
+            color: var(--text-light);
+            display: flex;
+            gap: 12px;
+        }
+        
+        .friend-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .friend-action {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background-color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .friend-action:hover {
+            background-color: var(--sidebar-hover);
+        }
+        
+        .friend-action.message {
+            color: var(--primary);
+        }
+        
+        .friend-action.remove {
+            color: var(--danger);
+        }
+        
+        /* Add Friend Modal */
+        .add-friend-modal {
+            display: none;
+        }
+        
+        .search-friend-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            background-color: var(--gray);
+            color: var(--text);
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-friend-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        
+        .no-friends-message {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+        /* Friends Page Specific Styles */
+        .add-friend-button.small {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--card-background);
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+        }
+
+        .toast-icon {
+            color: var(--primary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .friend-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .friend-avatar {
+                margin-right: 0;
+                margin-bottom: 12px;
+            }
+            
+            .friend-actions {
+                margin-top: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <div class="logo-circle">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <div class="app-name">Bflash</div>
+        </div>
+        <div class="search-profile">
+            <input type="text" class="search-bar" placeholder="Search...">
+            <div class="crown">
+                <i class="fas fa-crown"></i>
+            </div>
+            <div class="profile-icon" id="profile-menu-button">
+                <i class="fas fa-user"></i>
+            </div>
+            
+            <!-- Profile dropdown menu -->
+            <div class="profile-dropdown" id="profile-dropdown" style="display: none;">
+                <div class="dropdown-item" id="username-display">Username</div>
+                <div class="dropdown-item" id="logout-button">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <a href="index.html" class="sidebar-button">
+                <span class="sidebar-icon"><i class="fas fa-home"></i></span>
+                <span>Home</span>
+            </a>
+            <div class="sidebar-button active">
+                <span class="sidebar-icon"><i class="fas fa-users"></i></span>
+                <span>Friends</span>
+            </div>
+            <a href="stats.html" class="sidebar-button"> 
+                <span class="sidebar-icon"><i class="fas fa-chart-bar"></i></span>
+                <span>Stats</span>
+            </a>
+            <a href="settings.html" class="sidebar-button">
+                <span class="sidebar-icon"><i class="fas fa-cog"></i></span> 
+                <span>Settings</span>
+            </a>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="friends-container">
+                <div class="friends-header">
+                    <h1 class="friends-title">Friends</h1>
+                    <button class="add-friend-button" id="add-friend-button">
+                        <i class="fas fa-user-plus"></i> Add Friend
+                    </button>
+                </div>
+                
+                <div class="friends-tabs">
+                    <div class="friends-tab active" data-tab="all">All Friends</div>
+                    <div class="friends-tab" data-tab="pending">Pending <span class="pending-count"></span></div>
+                </div>
+                
+                <div class="friends-list" id="friends-list">
+                    <!-- Friend cards will be loaded here -->
+                    
+                </div>
+                <div class="friends-list" id="pending-list" style="display: none">
+                    <!-- Pending requests will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Friend Modal -->
+    <div class="modal" id="add-friend-modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Add Friend</h2>
+            <p>Search for friends by username or email</p>
+            <input type="text" class="search-friend-input" placeholder="Enter username or email...">
+            <div class="friends-list" id="search-results">
+                <!-- Search results will appear here -->
+                <div class="no-friends-message">
+                    No users found. Try a different search term.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // API Base URL
+        const API_URL = '/api';
+        
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load user profile and friends
+            loadUserProfile();
+            loadFriends();
+            
+            // Setup UI event listeners
+            setupEventListeners();
+        });
+        
+        // Load user profile
+        async function loadUserProfile() {
+            const token = localStorage.getItem('token');
+            const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (storedUser.username) {
+                document.getElementById('username-display').textContent = storedUser.username;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/users/me`, {
+                    headers: {
+                        'x-auth-token': token
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    throw new Error('Failed to load user profile');
+                }
+                
+                const userData = await response.json();
+                document.getElementById('username-display').textContent = userData.username;
+                
+                localStorage.setItem('user', JSON.stringify({
+                    id: userData._id,
+                    username: userData.username
+                }));
+                
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+        
+        // Load friends list
+        async function loadFriends() {
+            try {
+                const response = await fetch(`${API_URL}/friends/friends`, {
+                    headers: {
+                        'x-auth-token': localStorage.getItem('token')
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to load friends');
+                
+                const data = await response.json();
+                renderFriends(data.friends);
+                renderFriendRequests(data.friendRequests);
+            } catch (error) {
+                console.error('Error loading friends:', error);
+                showToast('Error loading friends list');
+            }
+        }
+        
+        // Render friends list
+        function renderFriends(friends) {
+            const friendsList = document.getElementById('friends-list');
+            friendsList.innerHTML = '';
+            
+            if (friends.length === 0) {
+                friendsList.innerHTML = `
+                    <div class="no-friends-message">
+                        You don't have any friends yet. Add some to start studying together!
+                    </div>`;
+                return;
+            }
+            
+            friends.forEach(friend => {
+                const friendCard = document.createElement('div');
+                friendCard.className = 'friend-card';
+                friendCard.innerHTML = `
+                    <div class="friend-avatar">${friend.username.charAt(0).toUpperCase()}</div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.username}</div>
+                        <div class="friend-stats">
+                            <span>${friend.deckCount || 0} Decks</span>
+                            <span>${friend.cardCount || 0} Cards</span>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <div class="friend-action message" title="Send message" data-friend-id="${friend._id}">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="friend-action remove" title="Remove friend" data-friend-id="${friend._id}">
+                            <i class="fas fa-user-minus"></i>
+                        </div>
+                    </div>
+                `;
+                friendsList.appendChild(friendCard);
+            });
+        }
+        
+        // Render friend requests
+        function renderFriendRequests(requests) {
+            const pendingList = document.getElementById('pending-list');
+            const pendingCount = document.querySelector('.pending-count');
+            
+            // Aggiorna il contatore delle richieste pendenti
+            if (requests.length > 0) {
+                pendingCount.textContent = `(${requests.length})`;
+            } else {
+                pendingCount.textContent = '';
+            }
+            
+            if (!requests.length) {
+                pendingList.innerHTML = `
+                    <div class="no-friends-message">
+                        No pending friend requests
+                    </div>`;
+                return;
+            }
+        
+            pendingList.innerHTML = '';
+            
+            requests.forEach(request => {
+                const requestCard = document.createElement('div');
+                requestCard.className = 'friend-card';
+                requestCard.innerHTML = `
+                    <div class="friend-avatar">${request.username.charAt(0).toUpperCase()}</div>
+                    <div class="friend-info">
+                        <div class="friend-name">${request.username}</div>
+                        <div class="friend-stats">
+                            <span class="pending-label">Wants to be your friend</span>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <div class="friend-action accept" title="Accept request" data-friend-id="${request._id}">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="friend-action reject" title="Reject request" data-friend-id="${request._id}">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                `;
+                pendingList.appendChild(requestCard);
+            });
+        }
+        
+        // Search users
+        async function searchUsers(query) {
+            try {
+                const response = await fetch(`${API_URL}/friends/search?query=${encodeURIComponent(query)}`, {
+                    headers: {
+                        'x-auth-token': localStorage.getItem('token')
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Search failed');
+                
+                const results = await response.json();
+                renderSearchResults(results);
+            } catch (error) {
+                console.error('Error searching users:', error);
+                showToast('Error searching users');
+            }
+        }
+        
+        // Render search results
+        function renderSearchResults(users) {
+            const searchResults = document.getElementById('search-results');
+            searchResults.innerHTML = '';
+            
+            if (users.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="no-friends-message">
+                        No users found. Try a different search term.
+                    </div>`;
+                return;
+            }
+            
+            users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.className = 'friend-card';
+                userElement.innerHTML = `
+                    <div class="friend-avatar">${user.username.charAt(0).toUpperCase()}</div>
+                    <div class="friend-info">
+                        <div class="friend-name">${user.username}</div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="add-friend-button small" data-user-id="${user._id}">
+                            <i class="fas fa-user-plus"></i> Add
+                        </button>
+                    </div>
+                `;
+                searchResults.appendChild(userElement);
+            });
+        }
+        
+        // Send friend request
+        async function sendFriendRequest(userId) {
+            try {
+                const response = await fetch(`${API_URL}/friends/send-request`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-auth-token': localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ friendId: userId })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to send request');
+                }
+                
+                showToast('Friend request sent!');
+                return await response.json();
+            } catch (error) {
+                console.error('Error sending friend request:', error);
+                showToast(`Error: ${error.message}`);
+                throw error;
+            }
+        }
+        
+        // Remove friend
+        async function removeFriend(friendId) {
+            try {
+                const response = await fetch(`${API_URL}/friends/remove-friend`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-auth-token': localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ friendId })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to remove friend');
+                }
+                
+                showToast('Friend removed successfully');
+                loadFriends(); // Refresh the list
+                return await response.json();
+            } catch (error) {
+                console.error('Error removing friend:', error);
+                showToast(`Error: ${error.message}`);
+                throw error;
+            }
+        }
+        
+        // Setup UI event listeners
+        function setupEventListeners() {
+            // Profile dropdown toggle
+            const profileButton = document.getElementById('profile-menu-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            profileButton.addEventListener('click', function() {
+                profileDropdown.style.display = profileDropdown.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            // Close dropdown when clicking elsewhere
+            document.addEventListener('click', function(event) {
+                if (!profileButton.contains(event.target)) {
+                    profileDropdown.style.display = 'none';
+                }
+            });
+            
+            // Logout button
+            document.getElementById('logout-button').addEventListener('click', function() {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'login.html';
+            });
+            
+            // Add friend button
+            const addFriendButton = document.getElementById('add-friend-button');
+            const addFriendModal = document.getElementById('add-friend-modal');
+            const closeModal = document.querySelector('.close-modal');
+            
+            addFriendButton.addEventListener('click', function() {
+                addFriendModal.style.display = 'flex';
+            });
+            
+            closeModal.addEventListener('click', function() {
+                addFriendModal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === addFriendModal) {
+                    addFriendModal.style.display = 'none';
+                }
+            });
+            
+            // Search in modal
+            const searchInput = document.querySelector('.search-friend-input');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', function(e) {
+                clearTimeout(searchTimeout);
+                const query = e.target.value.trim();
+                
+                if (query.length >= 3) {
+                    searchTimeout = setTimeout(() => {
+                        searchUsers(query);
+                    }, 300);
+                }
+            });
+            
+            // Add friend from search results (delegated event)
+            document.getElementById('search-results').addEventListener('click', function(e) {
+                const addButton = e.target.closest('.add-friend-button');
+                if (addButton) {
+                    const userId = addButton.dataset.userId;
+                    sendFriendRequest(userId)
+                        .then(() => {
+                            addFriendModal.style.display = 'none';
+                            searchInput.value = '';
+                        });
+                }
+            });
+            
+            // Remove friend (delegated event)
+            document.getElementById('friends-list').addEventListener('click', function(e) {
+                const removeButton = e.target.closest('.friend-action.remove');
+                if (removeButton) {
+                    const friendId = removeButton.dataset.friendId;
+                    const friendName = removeButton.closest('.friend-card').querySelector('.friend-name').textContent;
+                    
+                    if (confirm(`Are you sure you want to remove ${friendName} from your friends?`)) {
+                        removeFriend(friendId);
+                    }
+                }
+            });
+            
+            // Message friend (placeholder)
+            document.getElementById('friends-list').addEventListener('click', function(e) {
+                const messageButton = e.target.closest('.friend-action.message');
+                if (messageButton) {
+                    showToast('Messaging feature coming soon!');
+                }
+            });
+            
+            // Tab switching
+            const tabs = document.querySelectorAll('.friends-tab');
+            const friendsList = document.getElementById('friends-list');
+            const pendingList = document.getElementById('pending-list');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const tabType = this.dataset.tab;
+                    if (tabType === 'all') {
+                        friendsList.style.display = 'grid';
+                        pendingList.style.display = 'none';
+                    } else if (tabType === 'pending') {
+                        friendsList.style.display = 'none';
+                        pendingList.style.display = 'grid';
+                    }
+                });
+            });
+
+            // Gestione accetta/rifiuta richieste
+            document.getElementById('pending-list').addEventListener('click', async function(e) {
+                const acceptButton = e.target.closest('.friend-action.accept');
+                const rejectButton = e.target.closest('.friend-action.reject');
+                
+                if (acceptButton) {
+                    const friendId = acceptButton.dataset.friendId;
+                    try {
+                        await acceptFriendRequest(friendId);
+                        loadFriends(); // Ricarica la lista
+                        showToast('Friend request accepted!');
+                    } catch (error) {
+                        showToast('Error accepting friend request');
+                    }
+                }
+                
+                if (rejectButton) {
+                    const friendId = rejectButton.dataset.friendId;
+                    try {
+                        await rejectFriendRequest(friendId);
+                        loadFriends(); // Ricarica la lista
+                        showToast('Friend request rejected');
+                    } catch (error) {
+                        showToast('Error rejecting friend request');
+                    }
+                }
+            });
+        }
+        
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification show';
+            toast.innerHTML = `
+                <i class="fas fa-info-circle toast-icon"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Aggiungi queste funzioni per gestire le richieste
+        async function acceptFriendRequest(friendId) {
+            const response = await fetch(`${API_URL}/friends/accept-request`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-token': localStorage.getItem('token')
+                },
+                body: JSON.stringify({ friendId })
+            });
+        
+            if (!response.ok) throw new Error('Failed to accept request');
+            return await response.json();
+        }
+        
+        async function rejectFriendRequest(friendId) {
+            const response = await fetch(`${API_URL}/friends/reject-request`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-token': localStorage.getItem('token')
+                },
+                body: JSON.stringify({ friendId })
+            });
+        
+            if (!response.ok) throw new Error('Failed to reject request');
+            return await response.json();
+        }
+    </script>
+</body>
+</html>
