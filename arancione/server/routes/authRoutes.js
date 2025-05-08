@@ -5,6 +5,12 @@ const passport = require('passport');
 const User = require('../models/User');
 const router = express.Router();
 const { calculateAndUpdateStreak } = require('../utils/streakUtils');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+
+// Make sure environment variables are loaded in this file
+dotenv.config();
 
 // Registrazione
 router.post('/register', async (req, res) => {
@@ -237,6 +243,124 @@ router.post('/set-username', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+// Configura Nodemailer
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS
+  }
+});
 
+// Aggiungi questa funzione di verifica dopo la configurazione
+transporter.verify(function(error, success) {
+  if (error) {
+    console.error('Errore nella configurazione di Nodemailer:', error);
+  } else {
+    console.log('Server Nodemailer pronto per inviare email');
+  }
+});
+// Generate random 6-digit code
+function generateResetCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Temporary storage for reset codes (in production use Redis or DB)
+const resetCodes = new Map();
+
+// Request reset code
+router.post('/request-reset-code', async (req, res) => {
+  try {
+      const { email } = req.body;
+      
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(200).json({ message: 'If this email is registered, you will receive a reset code' });
+      }
+      
+      // Generate code and token
+      const resetCode = generateResetCode();
+      const resetToken = crypto.randomBytes(20).toString('hex');
+      
+      // Store code temporarily (valid for 15 minutes)
+      resetCodes.set(resetToken, {
+          email,
+          code: resetCode,
+          expiresAt: Date.now() + 900000 // 15 minutes
+      });
+      
+      // Send email with code
+      const mailOptions = {
+          to: email,
+          from: process.env.GMAIL_USER,
+          subject: 'Your Password Reset Code',
+          html: `
+              <p>You requested a password reset for your Bflash account.</p>
+              <p>Your reset code is: <strong>${resetCode}</strong></p>
+              <p>This code will expire in 15 minutes.</p>
+              <p>If you didn't request this, please ignore this email.</p>
+          `
+      };
+      
+      await transporter.sendMail(mailOptions);
+      
+      res.json({ 
+          message: 'Reset code sent to your email',
+          resetToken // Send back to client for verification
+      });
+      
+  } catch (err) {
+      console.error('Request reset code error:', err);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Reset password with code
+
+router.post('/reset-password', async (req, res) => {
+  try {
+      const { email, code, newPassword, resetToken } = req.body;
+      
+      // Verifica del codice di reset
+      const resetData = resetCodes.get(resetToken);
+      
+      if (!resetData || 
+          resetData.email !== email || 
+          resetData.code !== code || 
+          resetData.expiresAt < Date.now()) {
+          return res.status(400).json({ message: 'Codice di reset non valido o scaduto' });
+      }
+      
+      // Trova l'utente
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(400).json({ message: 'Utente non trovato' });
+      }
+      
+      // Genera il salt e hash manualmente
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      
+      // Aggiorna la password direttamente usando findOneAndUpdate
+      await User.findOneAndUpdate(
+          { email },
+          { 
+              $set: { 
+                  password: hashedPassword 
+              }
+          }
+      );
+      
+      // Elimina il codice di reset utilizzato
+      resetCodes.delete(resetToken);
+      
+      
+      res.json({ message: 'Password aggiornata con successo' });
+      
+  } catch (err) {
+      console.error('Errore nel reset della password:', err);
+      res.status(500).json({ message: 'Errore del server' });
+  }
+});
 
 module.exports = router;

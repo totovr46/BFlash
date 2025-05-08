@@ -6,7 +6,10 @@ const path = require('path');
 const app = require('./app');
 
 dotenv.config();
-
+console.log('Environment variables:', {
+  GMAIL_USER: process.env.GMAIL_USER,
+  GMAIL_PASS: process.env.GMAIL_PASS
+});
 // Middleware
 app.use(cors());
 app.use(express.json());

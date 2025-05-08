@@ -123,62 +123,140 @@
         }
 
         .social-login {
-    margin-top: 25px;
-    text-align: center;
-  }
-  
-  .divider {
-    color: #999;
-    margin: 15px 0;
-    position: relative;
-  }
-  
-  .divider::before, .divider::after {
-    content: "";
-    flex: 1;
-    border-bottom: 1px solid #ddd;
-    position: absolute;
-    top: 50%;
-    width: 45%;
-  }
-  
-  .divider::before {
-    right: 55%;
-  }
-  
-  .divider::after {
-    left: 55%;
-  }
-  
-  .social-button {
+            margin-top: 25px;
+            text-align: center;
+        }
+        
+        .divider {
+            color: #999;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+            position: absolute;
+            top: 50%;
+            width: 45%;
+        }
+        
+        .divider::before {
+            right: 55%;
+        }
+        
+        .divider::after {
+            left: 55%;
+        }
+        
+        .social-button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            background-color: white;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .social-button:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .google-button {
+            color: #DB4437;
+            border-color: #DB4437;
+        }
+        
+        .google-button:hover {
+            background-color: rgba(219, 68, 55, 0.1);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: var(--card-background);
+            margin: 15% auto;
+            padding: 25px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .forgot-password a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        /* Reset Password Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
     width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    background-color: white;
-    color: #555;
-    font-size: 15px;
-    font-weight: 500;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: var(--card-background);
+    margin: 15% auto;
+    padding: 25px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 24px;
     cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }
-  
-  .social-button:hover {
-    background-color: #f5f5f5;
-  }
-  
-  .google-button {
-    color: #DB4437;
-    border-color: #DB4437;
-  }
-  
-  .google-button:hover {
-    background-color: rgba(219, 68, 55, 0.1);
-  }
+    color: var(--text);
+}
+
+.form-success {
+    color: #2ecc71;
+    text-align: center;
+    margin-top: 15px;
+}
+
     </style>
 </head>
 <body>
@@ -209,6 +287,9 @@
             <button type="submit" class="auth-button">Sign in</button>
             <div class="auth-toggle">
                 Don't have an account? <a id="showRegister">Register</a>
+            </div>
+            <div class="forgot-password">
+                <a href="#" id="showForgotPassword">Forgot password?</a>
             </div>
         </form>
         
@@ -249,7 +330,50 @@
           </div>
     
     </div>
-
+<!-- Reset Password Modal -->
+<div id="resetPasswordModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>Reset Password</h3>
+        <div id="resetPasswordStep1">
+            <p>Enter your email to receive a reset code</p>
+            <form id="requestResetForm">
+                <div class="form-group">
+                    <input type="email" id="resetEmail" class="form-input" placeholder="Your email" required>
+                    <p class="form-error" id="resetEmailError"></p>
+                </div>
+                <button type="submit" class="auth-button">Send Reset Code</button>
+            </form>
+        </div>
+        
+        <div id="resetPasswordStep2" style="display: none;">
+            <p>Enter the code you received and your new password</p>
+            <form id="confirmResetForm">
+                <div class="form-group">
+                    <input type="text" id="resetCode" class="form-input" placeholder="6-digit code" required>
+                    <p class="form-error" id="resetCodeError"></p>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="newPassword" class="form-input" placeholder="New password" required>
+                    <p class="form-error" id="newPasswordError"></p>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="confirmNewPassword" class="form-input" placeholder="Confirm new password" required>
+                    <p class="form-error" id="confirmPasswordError"></p>
+                </div>
+                <p class="form-error" id="resetGeneralError"></p>
+                <p class="form-success" id="resetSuccessMessage" style="display: none; color: green;">
+                    Password reset successfully! You can now login with your new password.
+                </p>
+                <button type="submit" class="auth-button">Reset Password</button>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="loading-spinner" style="display: none;">
+    <i class="fas fa-spinner fa-spin"></i>
+    <span>Loading...</span>
+</div>
     <script>
         // Toggle between login and registration forms
         document.getElementById('showRegister').addEventListener('click', function() {
@@ -449,6 +573,147 @@ window.addEventListener('DOMContentLoaded', () => {
       console.error('Error processing Google auth:', err);
     }
   }
+});
+// Reset Password Logic
+let resetToken = '';
+
+document.getElementById('showForgotPassword').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('resetPasswordModal').style.display = 'block';
+    document.getElementById('resetPasswordStep1').style.display = 'block';
+    document.getElementById('resetPasswordStep2').style.display = 'none';
+    document.getElementById('resetSuccessMessage').style.display = 'none';
+});
+
+document.querySelector('.close-modal').addEventListener('click', function() {
+    document.getElementById('resetPasswordModal').style.display = 'none';
+});
+
+window.addEventListener('click', function(e) {
+    if (e.target === document.getElementById('resetPasswordModal')) {
+        document.getElementById('resetPasswordModal').style.display = 'none';
+    }
+});
+
+// Step 1: Request reset code
+document.getElementById('requestResetForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Reset errors
+    document.getElementById('resetEmailError').style.display = 'none';
+    
+    const email = document.getElementById('resetEmail').value.trim();
+    
+    if (!email) {
+        document.getElementById('resetEmailError').textContent = 'Email is required';
+        document.getElementById('resetEmailError').style.display = 'block';
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/auth/request-reset-code`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            document.getElementById('resetEmailError').textContent = data.message || 'Error sending reset code';
+            document.getElementById('resetEmailError').style.display = 'block';
+            return;
+        }
+        
+        // Success - move to step 2
+        resetToken = data.resetToken;
+        document.getElementById('resetPasswordStep1').style.display = 'none';
+        document.getElementById('resetPasswordStep2').style.display = 'block';
+        
+    } catch (error) {
+        document.getElementById('resetEmailError').textContent = 'Server connection error';
+        document.getElementById('resetEmailError').style.display = 'block';
+    }
+});
+
+// Step 2: Confirm reset with code and new password
+document.getElementById('confirmResetForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Reset errors
+    document.getElementById('resetCodeError').style.display = 'none';
+    document.getElementById('newPasswordError').style.display = 'none';
+    document.getElementById('confirmPasswordError').style.display = 'none';
+    document.getElementById('resetGeneralError').style.display = 'none';
+    
+    const code = document.getElementById('resetCode').value.trim();
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmNewPassword').value;
+    
+    // Validation
+    let hasError = false;
+    
+    if (!code) {
+        document.getElementById('resetCodeError').textContent = 'Reset code is required';
+        document.getElementById('resetCodeError').style.display = 'block';
+        hasError = true;
+    }
+    
+    if (!newPassword) {
+        document.getElementById('newPasswordError').textContent = 'New password is required';
+        document.getElementById('newPasswordError').style.display = 'block';
+        hasError = true;
+    } else if (newPassword.length < 6) {
+        document.getElementById('newPasswordError').textContent = 'Password must be at least 6 characters';
+        document.getElementById('newPasswordError').style.display = 'block';
+        hasError = true;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+        document.getElementById('confirmPasswordError').style.display = 'block';
+        hasError = true;
+    }
+    
+    if (hasError) return;
+    
+    try {
+        const response = await fetch(`${API_URL}/auth/reset-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                email: document.getElementById('resetEmail').value.trim(),
+                code,
+                newPassword,
+                resetToken 
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            document.getElementById('resetGeneralError').textContent = data.message || 'Error resetting password';
+            document.getElementById('resetGeneralError').style.display = 'block';
+            return;
+        }
+        
+        // Success
+        document.getElementById('confirmResetForm').style.display = 'none';
+        document.getElementById('resetSuccessMessage').style.display = 'block';
+        
+        // Auto-close after 3 seconds
+        setTimeout(() => {
+            document.getElementById('resetPasswordModal').style.display = 'none';
+        }, 1000);
+        
+    } catch (error) {
+        document.getElementById('resetGeneralError').textContent = 'Server connection error';
+        document.getElementById('resetGeneralError').style.display = 'block';
+    }
 });
     </script>
 </body>

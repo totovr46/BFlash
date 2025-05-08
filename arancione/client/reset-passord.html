@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bflash - Reset Password</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-container {
+            max-width: 450px;
+            margin: 50px auto;
+            background-color: var(--card-background);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            background-color: var(--gray);
+            color: var(--text);
+            font-size: 15px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        
+        .auth-button {
+            width: 100%;
+            background-color: var(--primary);
+            color: var(--background);
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+        
+        .form-error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-message {
+            color: #2ecc71;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h2 class="auth-title">Reset Your Password</h2>
+            <p>Enter a new password for your account</p>
+        </div>
+        
+        <form id="resetPasswordForm">
+            <input type="hidden" id="resetToken">
+            <div class="form-group">
+                <label for="newPassword" class="form-label">New Password</label>
+                <input type="password" id="newPassword" class="form-input" placeholder="Enter your new password" required>
+                <p class="form-error" id="newPasswordError"></p>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm your new password" required>
+                <p class="form-error" id="confirmPasswordError"></p>
+            </div>
+            <p class="form-error" id="resetError"></p>
+            <p class="success-message" id="successMessage">Password updated successfully! You can now <a href="login.html">login</a> with your new password.</p>
+            <button type="submit" class="auth-button">Reset Password</button>
+        </form>
+    </div>
+
+    <script>
+        // Estrai il token dall'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        document.getElementById('resetToken').value = token;
+        
+        // API Base URL
+        const API_URL = '/api';
+
+        // Gestione del form di reset password
+        document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Reset errori
+            document.getElementById('newPasswordError').style.display = 'none';
+            document.getElementById('confirmPasswordError').style.display = 'none';
+            document.getElementById('resetError').style.display = 'none';
+            
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const token = document.getElementById('resetToken').value;
+            
+            // Validazione client-side
+            let hasError = false;
+            
+            if (!newPassword) {
+                document.getElementById('newPasswordError').textContent = 'New password is required';
+                document.getElementById('newPasswordError').style.display = 'block';
+                hasError = true;
+            } else if (newPassword.length < 6) {
+                document.getElementById('newPasswordError').textContent = 'Password must be at least 6 characters';
+                document.getElementById('newPasswordError').style.display = 'block';
+                hasError = true;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+                document.getElementById('confirmPasswordError').style.display = 'block';
+                hasError = true;
+            }
+            
+            if (!token) {
+                document.getElementById('resetError').textContent = 'Invalid reset token';
+                document.getElementById('resetError').style.display = 'block';
+                hasError = true;
+            }
+            
+            if (hasError) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        token,
+                        password: newPassword 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    document.getElementById('resetError').textContent = data.message || 'Error resetting password';
+                    document.getElementById('resetError').style.display = 'block';
+                    return;
+                }
+                
+                // Successo - mostra messaggio e nascondi form
+                document.getElementById('resetPasswordForm').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                
+            } catch (error) {
+                document.getElementById('resetError').textContent = 'Server connection error';
+                document.getElementById('resetError').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
