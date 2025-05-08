@@ -39,7 +39,8 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Deck'
   }],
-
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
   // --- Add Streak Fields ---
   lastLoginDate: {
     type: Date,
@@ -50,7 +51,6 @@ const userSchema = new mongoose.Schema({
     default: 0
   },
   // --- End Streak Fields ---
-
   createdAt: {
     type: Date,
     default: Date.now
