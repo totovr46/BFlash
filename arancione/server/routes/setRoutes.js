@@ -32,8 +32,40 @@ router.post('/:deckId/sets', auth, async (req, res) => {
 // Ottieni tutti i set di un deck
 router.get('/:deckId/sets', auth, async (req, res) => {
   try {
+    // Trova tutti i set del deck
     const sets = await Set.find({ deck: req.params.deckId });
-    res.json(sets);
+    
+    // Recupera le statistiche per tutti i set in una singola query aggregate
+    const setIds = sets.map(set => set._id);
+    const cardStats = await Card.aggregate([
+      { $match: { set: { $in: setIds } } },
+      { 
+        $group: {
+          _id: '$set',
+          knownCount: {
+            $sum: { $cond: [{ $eq: ['$known', 'yes'] }, 1, 0] }
+          },
+          unknownCount: {
+            $sum: { $cond: [{ $eq: ['$known', 'no'] }, 1, 0] }
+          }
+        }
+      }
+    ]);
+
+    // Mappa le statistiche sui set
+    const setsWithStats = sets.map(set => {
+      const stats = cardStats.find(c => c._id.toString() === set._id.toString()) || 
+                   { knownCount: 0, unknownCount: 0 };
+      return {
+        ...set.toObject(),
+        stats: {
+          known: stats.knownCount,
+          unknown: stats.unknownCount
+        }
+      };
+    });
+
+    res.json(setsWithStats);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
