@@ -1160,7 +1160,7 @@ async function performSearch(query) {
                         
                         if (!response.ok) throw new Error('Error deleting set');
                         
-                        alert('Set successfully deleted!');
+
                         window.location.href = `deck.html?id=${currentDeckId}`;
                         
                     } catch (error) {
@@ -1448,7 +1448,7 @@ async function performSearch(query) {
                         
                         if (!response.ok) throw new Error('Error deleting set');
                         
-                        alert('Set successfully deleted!');
+
                         window.location.href = `deck.html?id=${currentDeckId}`;
                         
                     } catch (error) {
@@ -1667,7 +1667,6 @@ function displayGeneratedFlashcards(flashcards) {
     // Verifica che flashcards sia un array valido
     if (!Array.isArray(flashcards)) {
         console.error("Le flashcard non sono in un formato valido:", flashcards);
-        alert("Flashcard successfully moved!");
         return;
     }
 
@@ -1763,7 +1762,7 @@ function displayGeneratedFlashcards(flashcards) {
 
             if (!response.ok) throw new Error('Error adding flashcards.');
 
-            alert(`${selectedFlashcards.length} flashcard aggiunte con successo!`);
+
             modal.remove();
             loadCards();
         } catch (error) {

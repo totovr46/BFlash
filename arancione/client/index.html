@@ -757,7 +757,7 @@ async function deleteDeck(deckId) {
         
         if (!response.ok) throw new Error('Error deleting deck');
         
-        alert('Deck successfully deleted!');
+
         loadDecks(); // Ricarica la lista dei deck
         
     } catch (error) {
@@ -817,7 +817,7 @@ async function editDeck(deckId, currentSubject, currentDescription, currentColor
 
             if (!response.ok) throw new Error('Error updating deck');
 
-            alert('Deck updated successfully!');
+
             document.getElementById('edit-deck-modal').style.display = 'none';
             loadDecks();
 
@@ -946,8 +946,7 @@ async function editDeck(deckId, currentSubject, currentDescription, currentColor
                     
                     const newDeck = await response.json();
                     
-                    // Mostra un messaggio di conferma
-                    alert('Deck created succesfully!');
+
                     
                     // Close modal and reset form
                     addDeckModal.style.display = 'none';

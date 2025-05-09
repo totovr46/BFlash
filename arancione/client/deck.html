@@ -840,24 +840,7 @@
             loadSets();
             setupEventListeners();
         });
-// Set up event listeners for the action buttons
-document.querySelectorAll('.carousel-slide button').forEach((button, index) => {
-    button.addEventListener('click', () => {
-        switch(index) {
-            case 0:
-                window.location.href = `flashcard.html?deckId=${currentDeckId}&mode=unknown`;
-                break;
-            case 1:
-                // Aggiungi qui la logica per la modalità ripasso
-                alert('Modalità Ripasso selezionata');
-                break;
-            case 2:
-                // Aggiungi qui la logica per la modalità esame
-                alert('Modalità Esame selezionata');
-                break;
-        }
-    });
-});
+
 // Load user profile
 function loadUserProfile() {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -916,62 +899,56 @@ async function loadSets() {
 
 
         
-                // Visualizza i set
-        async function displaySets(sets) {
-        const container = document.getElementById('sets-container');
-        const studyDeckButton = document.querySelector('.study-set-container');
-        
+    async function displaySets(sets) {
+    const container = document.getElementById('sets-container');
+    const studyDeckButton = document.querySelector('.study-set-container');
+    
+    container.innerHTML = '';
 
+    if (!sets || sets.length === 0) {
+        container.innerHTML = '<div class="no-sets">No sets available. Add your first set!</div>';
+        studyDeckButton.style.display = 'none';
+        return;
+    }
+
+    sets.forEach(set => {
+        const setElement = document.createElement('div');
+        setElement.className = 'set-card';
+        setElement.dataset.setId = set._id;
         
-        // Svuota il container
-        container.innerHTML = '';
-    
-        if (!sets || sets.length === 0) {
-            const noSetsMessage = document.createElement('div');
-            noSetsMessage.className = 'no-sets';
-            noSetsMessage.textContent = 'No sets available. Add your first set!';
-            container.appendChild(noSetsMessage);
-            
-            // Nascondi sia il pulsante che il fixed container se non ci sono set
-            studyDeckButton.style.display = 'none';
-            return;
-        }
-    
-        let totalCards = 0;  // Contatore per tutte le card nel deck
-    
-        // Aggiungi i set e calcola il totale delle card
-        for (const set of sets) {
-    const setElement = document.createElement('div');
-setElement.className = 'set-card';
-setElement.dataset.setId = set._id;
-setElement.innerHTML = `
-    <div class="set-menu-button" title="Menu">
-        <i class="fas fa-ellipsis-v"></i>
-    </div>
-    <div class="set-menu">
-        <div class="set-menu-item edit">
-            <i class="fas fa-edit"></i>
-            Edit
-        </div>
-        <div class="set-menu-item move">
-            <i class="fas fa-exchange-alt"></i>
-            Move
-        </div>
-        <div class="set-menu-item delete">
-            <i class="fas fa-trash"></i>
-            Delete
-        </div>
-    </div>
-    <h3>${set.name}</h3>
-    <div class="progress-container">
-        <div class="progress-bar-container">
-            <div class="progress-bar" style="width: 0%;"></div>
-        </div>
-        <div class="progress-stats">
-            <span>0 Known • 0 Unknown</span>
-        </div>
-    </div>
-`;
+        const knownCount = set.stats.known;
+        const unknownCount = set.stats.unknown;
+        const progressPercentage = (knownCount + unknownCount) > 0 ? 
+            Math.round((knownCount / (knownCount + unknownCount)) * 100) : 0;
+
+        setElement.innerHTML = `
+            <div class="set-menu-button" title="Menu">
+                <i class="fas fa-ellipsis-v"></i>
+            </div>
+            <div class="set-menu">
+                <div class="set-menu-item edit">
+                    <i class="fas fa-edit"></i>
+                    Edit
+                </div>
+                <div class="set-menu-item move">
+                    <i class="fas fa-exchange-alt"></i>
+                    Move
+                </div>
+                <div class="set-menu-item delete">
+                    <i class="fas fa-trash"></i>
+                    Delete
+                </div>
+            </div>
+            <h3>${set.name}</h3>
+            <div class="progress-container">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${progressPercentage}%;"></div>
+                </div>
+                <div class="progress-stats">
+                    <span>${knownCount} Known • ${unknownCount} Unknown</span>
+                </div>
+            </div>
+        `;
 
 // Event listener per il menu
 const menuButton = setElement.querySelector('.set-menu-button');
@@ -987,15 +964,43 @@ menuButton.addEventListener('click', (e) => {
 });
 
 // Event listeners per le opzioni del menu
-setElement.querySelector('.set-menu-item.edit').addEventListener('click', (e) => {
+setElement.querySelector('.set-menu-item.edit').addEventListener('click', async (e) => {
     e.stopPropagation();
-    alert('Funzionalità di modifica in arrivo!');
+    const setId = setElement.dataset.setId;
+    const currentName = setElement.querySelector('h3').textContent;
+    
+    const newName = prompt('Enter new set name:', currentName);
+    
+    if (newName && newName.trim() !== '') {
+        try {
+            const response = await fetch(`${API_URL}/sets/${currentDeckId}/sets/${setId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-token': localStorage.getItem('token')
+                },
+                body: JSON.stringify({ name: newName })
+            });
+            
+            if (!response.ok) throw new Error('Error updating set');
+            
+            const updatedSet = await response.json();
+            
+            // Aggiorna il nome del set nell'interfaccia
+            setElement.querySelector('h3').textContent = updatedSet.name;
+            
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error updating set');
+        }
+    }
     menu.style.display = 'none';
 });
 
 setElement.querySelector('.set-menu-item.delete').addEventListener('click', (e) => {
     e.stopPropagation();
-    const confirmDelete = confirm('Sei sicuro di voler eliminare questo set? Questa azione non può essere annullata.');
+    const confirmDelete = confirm('Are you sure you want to delete this set? This action cannot be undone.');
     if (confirmDelete) {
         deleteSet(set._id);
     }
@@ -1017,42 +1022,12 @@ setElement.addEventListener('click', (e) => {
     if (!e.target.closest('.set-menu') && !e.target.closest('.set-menu-button')) {
         window.location.href = `set.html?deckId=${currentDeckId}&setId=${set._id}`;
     }
-});
+});        
+        container.appendChild(setElement);
+    });
 
-            container.appendChild(setElement);
-    
-            // Carica le statistiche e aggiorna il conteggio totale
-            try {
-                const response = await fetch(`${API_URL}/sets/${currentDeckId}/sets/${set._id}/stats`, {
-                    headers: {
-                        'x-auth-token': localStorage.getItem('token')
-                    }
-                });
-    
-                if (!response.ok) throw new Error(`Error nel caricamento delle statistiche per il set ${set.name}`);
-    
-                const stats = await response.json();
-                const knownCount = stats.known || 0;
-                const unknownCount = stats.unknown || 0;
-                totalCards += (knownCount + unknownCount);
-    
-                const progressBar = setElement.querySelector('.progress-bar');
-                const progressStats = setElement.querySelector('.progress-stats');
-                const progressPercentage = (knownCount + unknownCount) > 0 ? 
-                    Math.round((knownCount / (knownCount + unknownCount)) * 100) : 0;
-    
-                progressBar.style.width = `${progressPercentage}%`;
-                progressStats.innerHTML = `
-                    <span>${knownCount} Known • ${unknownCount} Unknown</span>
-                `;
-            } catch (error) {
-                console.error('Error loading statistics for the set:', error);
-            }
-        }
-    
-        // Gestisci la visibilità del pulsante study deck
-        studyDeckButton.style.display = totalCards === 0 ? 'none' : 'flex';
-    }
+    studyDeckButton.style.display = sets.length > 0 ? 'flex' : 'none';
+}
         // Funzione per eliminare un set
         async function deleteSet(setId) {
             try {
@@ -1065,7 +1040,7 @@ setElement.addEventListener('click', (e) => {
                 
                 if (!response.ok) throw new Error('Error deleting set');
                 
-                alert('Set succesfully deleted!');
+
                 currentSets = currentSets.filter(set => set._id !== setId);
                 displaySets(currentSets);
             } catch (error) {
@@ -1293,7 +1268,7 @@ async function performSearch(query) {
                 
                 if (!response.ok) throw new Error('Error deleting deck');
                 
-                alert('Deck successfully deleted!');
+
                 window.location.href = 'index.html';
                 
             } catch (error) {
@@ -1394,7 +1369,7 @@ async function performSearch(query) {
             document.title = `${newDeckData.subject || 'Mazzo'} - Bflash`;
             
             document.getElementById('edit-deck-modal').style.display = 'none';
-            alert('Deck updated successfully!');
+
             
         } catch (error) {
             console.error('Error:', error);
@@ -1468,7 +1443,7 @@ document.getElementById('move-set-button').addEventListener('click', async funct
         
         // Chiudi il modale
         document.getElementById('move-set-modal').style.display = 'none';
-        alert('Set moved successfully!');
+
         
     } catch (error) {
         console.error('Error:', error);
