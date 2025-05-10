@@ -216,28 +216,28 @@ router.delete('/me', auth, async (req, res) => {
              return res.status(404).json({ message: 'User not found.' });
         }
 
-        // ** IMPORTANT: Decide on Cascade Delete Strategy **
-        // Option 1: Simple User Delete (Orphans data) - EASIER
-        await User.findByIdAndDelete(userId);
-        console.log(`User deleted: ${userId}`);
-
-        // Option 2: Cascade Delete (More Complex, Safer Data Management) - HARDER
-        // // Find all decks owned by the user
-        // const userDecks = await Deck.find({ owner: userId });
-        // const deckIds = userDecks.map(deck => deck._id);
-        // // Find all sets within those decks
-        // const userSets = await SetModel.find({ deck: { $in: deckIds } });
-        // const setIds = userSets.map(set => set._id);
-        // // Delete Cards, then Sets, then Decks, then User
-        // console.log(`Deleting data for user: ${userId}`);
-        // await Card.deleteMany({ deck: { $in: deckIds } });
-        // console.log(`Deleted cards for user: ${userId}`);
-        // await SetModel.deleteMany({ deck: { $in: deckIds } });
-        // console.log(`Deleted sets for user: ${userId}`);
-        // await Deck.deleteMany({ owner: userId });
-        // console.log(`Deleted decks for user: ${userId}`);
+        // // ** IMPORTANT: Decide on Cascade Delete Strategy **
+        // // Option 1: Simple User Delete (Orphans data) - EASIER
         // await User.findByIdAndDelete(userId);
         // console.log(`User deleted: ${userId}`);
+
+        // Option 2: Cascade Delete (More Complex, Safer Data Management) - HARDER
+        // Find all decks owned by the user
+        const userDecks = await Deck.find({ owner: userId });
+        const deckIds = userDecks.map(deck => deck._id);
+        // Find all sets within those decks
+        const userSets = await SetModel.find({ deck: { $in: deckIds } });
+        const setIds = userSets.map(set => set._id);
+        // Delete Cards, then Sets, then Decks, then User
+        console.log(`Deleting data for user: ${userId}`);
+        await Card.deleteMany({ deck: { $in: deckIds } });
+        console.log(`Deleted cards for user: ${userId}`);
+        await SetModel.deleteMany({ deck: { $in: deckIds } });
+        console.log(`Deleted sets for user: ${userId}`);
+        await Deck.deleteMany({ owner: userId });
+        console.log(`Deleted decks for user: ${userId}`);
+        await User.findByIdAndDelete(userId);
+        console.log(`User deleted: ${userId}`);
         // ** END Option 2 **
 
         res.json({ message: 'Account deleted successfully.' });
