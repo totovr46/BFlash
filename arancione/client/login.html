@@ -443,104 +443,126 @@
 
         // Handle registration submission
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Reset errors
-            document.getElementById('registerError').style.display = 'none';
-            document.getElementById('registerUsernameError').style.display = 'none';
-            document.getElementById('registerEmailError').style.display = 'none';
-            document.getElementById('registerPasswordError').style.display = 'none';
-            document.getElementById('registerConfirmPasswordError').style.display = 'none';
-            
-            const username = document.getElementById('registerUsername').value.trim();
-            const email = document.getElementById('registerEmail').value.trim();
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+    e.preventDefault();
 
-            // Client-side validation
-            let hasError = false;
+    // Reset errors
+    const errorFields = [
+        'registerError',
+        'registerUsernameError',
+        'registerEmailError',
+        'registerPasswordError',
+        'registerConfirmPasswordError'
+    ];
+    errorFields.forEach(id => {
+        const el = document.getElementById(id);
+        el.textContent = '';
+        el.style.display = 'none';
+    });
 
-            if (!username) {
-                document.getElementById('registerUsernameError').textContent = 'Username is required';
-                document.getElementById('registerUsernameError').style.display = 'block';
-                hasError = true;
-            }
+    const username = document.getElementById('registerUsername').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerConfirmPassword').value;
 
-            if (!email) {
-                document.getElementById('registerEmailError').textContent = 'Email is required';
-                document.getElementById('registerEmailError').style.display = 'block';
-                hasError = true;
-            } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
-                document.getElementById('registerEmailError').textContent = 'Invalid email format';
-                document.getElementById('registerEmailError').style.display = 'block';
-                hasError = true;
-            }
+    // Client-side validation
+    let hasError = false;
 
-            if (!password) {
-                document.getElementById('registerPasswordError').textContent = 'Password is required';
-                document.getElementById('registerPasswordError').style.display = 'block';
-                hasError = true;
-            } else if (password.length < 6) {
-                document.getElementById('registerPasswordError').textContent = 'Password must be at least 6 characters';
-                document.getElementById('registerPasswordError').style.display = 'block';
-                hasError = true;
-            }
+    if (!username) {
+        document.getElementById('registerUsernameError').textContent = 'Username is required';
+        document.getElementById('registerUsernameError').style.display = 'block';
+        hasError = true;
+    } else if (username.length < 3) {
+        document.getElementById('registerUsernameError').textContent = 'Username must be at least 3 characters';
+        document.getElementById('registerUsernameError').style.display = 'block';
+        hasError = true;
+    }
 
-            if (password !== confirmPassword) {
-                document.getElementById('registerConfirmPasswordError').textContent = 'Passwords do not match';
-                document.getElementById('registerConfirmPasswordError').style.display = 'block';
-                hasError = true;
-            }
+    if (!email) {
+        document.getElementById('registerEmailError').textContent = 'Email is required';
+        document.getElementById('registerEmailError').style.display = 'block';
+        hasError = true;
+    } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/.test(email)) {
+        document.getElementById('registerEmailError').textContent = 'Invalid email format';
+        document.getElementById('registerEmailError').style.display = 'block';
+        hasError = true;
+    }
 
-            if (hasError) return;
+    if (!password) {
+        document.getElementById('registerPasswordError').textContent = 'Password is required';
+        document.getElementById('registerPasswordError').style.display = 'block';
+        hasError = true;
+    } else if (password.length < 6) {
+        document.getElementById('registerPasswordError').textContent = 'Password must be at least 6 characters';
+        document.getElementById('registerPasswordError').style.display = 'block';
+        hasError = true;
+    }
 
-            try {
-                const response = await fetch(`${API_URL}/auth/register`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, email, password })
-                });
+    if (password !== confirmPassword) {
+        document.getElementById('registerConfirmPasswordError').textContent = 'Passwords do not match';
+        document.getElementById('registerConfirmPasswordError').style.display = 'block';
+        hasError = true;
+    }
 
-                const data = await response.json();
+    if (hasError) return;
 
-                if (!response.ok) {
-                    if (data.errors) {
-                        // Handle specific validation errors from the server
-                        data.errors.forEach(error => {
-                            if (error.param === 'username') {
-                                document.getElementById('registerUsernameError').textContent = error.msg;
-                                document.getElementById('registerUsernameError').style.display = 'block';
-                            } else if (error.param === 'email') {
-                                document.getElementById('registerEmailError').textContent = error.msg;
-                                document.getElementById('registerEmailError').style.display = 'block';
-                            } else if (error.param === 'password') {
-                                document.getElementById('registerPasswordError').textContent = error.msg;
-                                document.getElementById('registerPasswordError').style.display = 'block';
-                            }
-                        });
-                    } else {
-                        // General error message
-                        document.getElementById('registerError').textContent = data.message || 'Registration error';
-                        document.getElementById('registerError').style.display = 'block';
+    try {
+        const response = await fetch(`${API_URL}/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (data.errors && Array.isArray(data.errors)) {
+                data.errors.forEach(error => {
+                    const errorElementId = {
+                        username: 'registerUsernameError',
+                        email: 'registerEmailError',
+                        password: 'registerPasswordError'
+                    }[error.param];
+
+                    if (errorElementId) {
+                        const el = document.getElementById(errorElementId);
+                        el.textContent = error.msg;
+                        el.style.display = 'block';
                     }
-                    return;
-                }
-
-                // Registration successful - save token and redirect
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                window.location.href = 'index.html';
-
-            } catch (error) {
-                document.getElementById('registerError').textContent = 'Server connection error';
+                });
+            } else if (data.field) {
+                const fieldMap = {
+                    username: 'registerUsernameError',
+                    email: 'registerEmailError'
+                };
+                const el = document.getElementById(fieldMap[data.field] || 'registerError');
+                el.textContent = data.message;
+                el.style.display = 'block';
+            } else {
+                document.getElementById('registerError').textContent = data.message || 'Registration error';
                 document.getElementById('registerError').style.display = 'block';
             }
-        });
-        document.getElementById('googleLogin').addEventListener('click', function() {
+            return;
+        }
+
+        // Registration successful
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        window.location.href = 'index.html';
+
+    } catch (error) {
+        console.error('Registration error:', error);
+        document.getElementById('registerError').textContent = 'Server connection error: ' + error.message;
+        document.getElementById('registerError').style.display = 'block';
+    }
+});
+
+// Google login handler
+document.getElementById('googleLogin').addEventListener('click', function () {
     window.location.href = '/api/auth/google';
-  });
+});
+
 
   // Gestisci il token quando torni da Google OAuth
 window.addEventListener('DOMContentLoaded', () => {

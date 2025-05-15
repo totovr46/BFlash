@@ -16,7 +16,12 @@ dotenv.config();
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
+    if (username.length < 3) {
+      return res.status(400).json({ 
+        message: 'Username must be at least 3 characters long',
+        field: 'username'
+      });
+    }
     // Verifica se l'email esiste già
     let user = await User.findOne({ email });
     if (user) {
