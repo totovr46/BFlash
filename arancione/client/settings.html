@@ -217,10 +217,14 @@
             <h2>Account</h2>
             <form id="profile-form">
                 <div class="form-group">
+                    <label for="profile-username" class="form-label">Username</label>
+                    <input type="text" id="profile-username" class="form-input" placeholder="Enter your new username" required>
+                </div>
+                <div class="form-group">
                     <label for="profile-bio" class="form-label">Bio</label>
                     <textarea id="profile-bio" class="form-input" placeholder="Tell us a little about yourself..."></textarea>
                 </div>
-                 <div id="profile-message" class="message"></div>
+                <div id="profile-message" class="message"></div>
                 <button type="submit" class="auth-button">Update Profile</button>
             </form>
             <hr style="border-color: var(--gray); margin: 30px 0;">
@@ -359,6 +363,7 @@
         const logoutButton = document.getElementById('logout-button'); // For header
         const profileButton = document.getElementById('profile-menu-button'); // For header
         const profileDropdown = document.getElementById('profile-dropdown'); // For header
+        const profileUsernameInput = document.getElementById('profile-username'); // For profile username input
     
     
         // --- Theme Switching Logic ---
@@ -426,6 +431,7 @@
                 const user = await response.json();
     
                 // Populate profile form
+                if (profileUsernameInput) profileUsernameInput.value = user.username || '';
                 if (profileBioInput) profileBioInput.value = user.profile?.bio || '';
                 if (usernameDisplay) usernameDisplay.textContent = user.username || 'User';
     
@@ -457,7 +463,10 @@
             profileForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 if (!token) return;
-                const bio = profileBioInput.value;
+
+                const username = profileUsernameInput.value.trim();
+                const bio = profileBioInput.value.trim();
+
                 try {
                     const response = await fetch(`${API_URL}/users/me`, {
                         method: 'PUT',
@@ -465,13 +474,14 @@
                             'Content-Type': 'application/json',
                             'x-auth-token': token
                         },
-                        body: JSON.stringify({ bio })
+                        body: JSON.stringify({ username, bio })
                     });
-                     const result = await response.json();
+                    const result = await response.json();
                     if (!response.ok) throw new Error(result.message || 'Failed to update profile');
                     showMessage(profileMessage, 'Profile updated successfully!');
+                    loadUserData(); // Reload user data to reflect changes
                 } catch (error) {
-                     showMessage(profileMessage, error.message || 'Error updating profile', true);
+                    showMessage(profileMessage, error.message || 'Error updating profile', true);
                 }
             });
         }
