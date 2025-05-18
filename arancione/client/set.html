@@ -676,12 +676,12 @@
     </div>
     
     <!-- Add Card Button -->
-    <div class="add-deck-container" id="add-card-button">
-        <div class="add-circle">
+    <div class="add-deck-container">
+        <div class="add-circle" id="add-card-button">
             <i class="fas fa-plus"></i>
         </div>
         <div class="add-deck-button">Add flashcard</div>
-        <button id="generate-flashcards-button" class="auth-button" >Generate with AI</button>
+        <button id="generate-flashcards-button" class="auth-button">Generate with AI</button>
     </div>
     <div class="study-set-container">
         <button class="study-set-button" id="study-set-button">Study set</button>
@@ -1082,6 +1082,11 @@ async function performSearch(query) {
             
             // Pulsante aggiungi flashcard
             document.getElementById('add-card-button').addEventListener('click', () => {
+                document.getElementById('add-card-modal').style.display = 'flex';
+            });
+
+            // Aggiungi questo codice per il testo "Add flashcard"
+            document.querySelector('.add-deck-button').addEventListener('click', () => {
                 document.getElementById('add-card-modal').style.display = 'flex';
             });
             
@@ -1838,8 +1843,10 @@ function displayGeneratedFlashcards(flashcards) {
 
         function setupGenerateFlashcardsEvents() {
             // Sostituisce il click handler originale sul button Generate Flashcards
-            document.getElementById('generate-flashcards-button').addEventListener('click', showGenerateFlashcardsModal);
-            
+            document.getElementById('generate-flashcards-button').addEventListener('click', () => {
+                document.getElementById('generate-flashcards-modal').style.display = 'flex';
+                document.getElementById('flashcard-source-text').focus();
+            });            
             // Gestori degli eventi per il nuovo modale
             document.getElementById('start-generate').addEventListener('click', handleGenerateFlashcards);
             
