@@ -16,7 +16,7 @@ const SetSchema = new mongoose.Schema({
       ref: 'Card'
     }
   ]
-});
+}, { timestamps: true }); // Aggiunge automaticamente createdAt e updatedAt
 
 // Controlla se il modello è già stato definito
 module.exports = mongoose.models.Set || mongoose.model('Set', SetSchema);

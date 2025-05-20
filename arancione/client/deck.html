@@ -40,7 +40,6 @@
       
         })();
       </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Stili specifici per la pagina dei set */
     .deck-header {
@@ -686,6 +685,9 @@
         <div class="action-button" id="edit-button" title="Edit deck">
             <i class="fas fa-edit"></i>
         </div>
+        <div class="action-button" id="sort-button" title="Sort sets">
+        <i class="fas fa-sort"></i>
+        </div>
         <div class="action-button delete" id="delete-button" title="Delete deck">
             <i class="fas fa-trash"></i>
         </div>
@@ -915,6 +917,9 @@ async function loadSets() {
         const setElement = document.createElement('div');
         setElement.className = 'set-card';
         setElement.dataset.setId = set._id;
+        setElement.dataset.name = set.name;
+        setElement.dataset.createdAt = set.createdAt; // Aggiungi la data di creazione
+        setElement.dataset.updatedAt = set.updatedAt; // Aggiungi la data di ultima modifica
         
         const knownCount = set.stats.known;
         const unknownCount = set.stats.unknown;
@@ -1027,6 +1032,10 @@ setElement.addEventListener('click', (e) => {
     });
 
     studyDeckButton.style.display = sets.length > 0 ? 'flex' : 'none';
+
+    // Ordina i set in base al criterio salvato
+    const currentSort = localStorage.getItem('setSort') || 'name';
+    sortSets(currentSort);
 }
         // Funzione per eliminare un set
         async function deleteSet(setId) {
@@ -1248,7 +1257,7 @@ async function performSearch(query) {
             displaySets(currentSets);
             document.getElementById('add-set-modal').style.display = 'none';
             document.getElementById('add-set-form').reset();
-            
+            window.location.reload();
         } catch (error) {
             console.error('Error:', error);
             alert(`Error: ${error.message}`);
@@ -1505,6 +1514,41 @@ document.getElementById('mobile-delete').addEventListener('click', () => {
     mobileMenu.style.display = 'none';
     document.getElementById('delete-button').click(); // Simula il clic sul pulsante desktop
 });
+document.getElementById('sort-button').addEventListener('click', () => {
+    const sortOptions = ['name', 'createdAt', 'updatedAt'];
+    const currentSort = localStorage.getItem('setSort') || 'name';
+    const nextSort = sortOptions[(sortOptions.indexOf(currentSort) + 1) % sortOptions.length];
+    localStorage.setItem('setSort', nextSort);
+    sortSets(nextSort);
+
+    // Aggiorna l'icona del pulsante
+    const sortButton = document.getElementById('sort-button');
+    const sortIcons = {
+        name: 'fas fa-sort-alpha-down',
+        createdAt: 'fas fa-calendar-plus',
+        updatedAt: 'fas fa-calendar-check'
+    };
+    sortButton.innerHTML = `<i class="${sortIcons[nextSort]}"></i>`;
+});
+
+function sortSets(criteria) {
+    const setsContainer = document.getElementById('sets-container'); // Corretto
+    const sets = Array.from(setsContainer.children);
+
+    sets.sort((a, b) => {
+        const aData = a.dataset[criteria];
+        const bData = b.dataset[criteria];
+
+        if (criteria === 'name') {
+            return aData.localeCompare(bData);
+        } else {
+            return new Date(aData) - new Date(bData);
+        }
+    });
+
+    setsContainer.innerHTML = '';
+    sets.forEach(set => setsContainer.appendChild(set));
+}
     </script>
 </body>
 </html>

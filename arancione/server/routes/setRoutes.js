@@ -130,20 +130,18 @@ router.put('/:deckId/sets/:setId', auth, async (req, res) => {
     const { deckId, setId } = req.params;
     const { name } = req.body;
 
-    // Trova il deck e verifica che l'utente sia autorizzato
     const deck = await Deck.findById(deckId);
     if (!deck || deck.owner.toString() !== req.user.id) {
       return res.status(404).json({ message: 'Deck not found or unauthorized' });
     }
 
-    // Trova e aggiorna il set
     const set = await Set.findById(setId);
     if (!set || set.deck.toString() !== deckId) {
       return res.status(404).json({ message: 'Set not found or unauthorized' });
     }
 
     set.name = name || set.name;
-    await set.save();
+    await set.save(); 
 
     res.json(set);
   } catch (err) {
