@@ -95,12 +95,35 @@
         }
         
             .card-item {
-                background-color: var(--card-background);
+                perspective: 1000px;
+                height: 300px;
+            }
+        
+            .card-inner {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                transition: transform 0.6s;
+                transform-style: preserve-3d;
+                border-radius: 16px;
+                box-shadow: 0 4px 12px var(--shadow-color);
+            }
+        
+            .card-item.flipped .card-inner {
+                transform: rotateY(180deg);
+            }
+            .card-item.flipped .card-menu-button {
+                display: none;
+            }
+        
+            .card-front, .card-back {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
                 border-radius: 16px;
                 padding: 20px;
-                box-shadow: 0 4px 12px var(--shadow-color);
-                transition: all 0.2s;
-                position: relative;
+                background-color: var(--card-background);
         
                 /* Centrare il contenuto */
                 display: flex;
@@ -108,7 +131,28 @@
                 justify-content: center;
                 align-items: center;
                 text-align: center;
-                height: 300px; /* Altezza fissa per uniformità */
+            }
+        
+            .card-back {
+                transform: rotateY(180deg);
+            }
+        
+            .card-menu-button {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                z-index: 10;
+            }
+        
+            .tap-hint {
+                position: absolute;
+                bottom: 15px;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 12px;
+                color: var(--text-light);
+                opacity: 0.7;
             }
         
             .card-item h3 {
@@ -788,6 +832,20 @@
         </div>
     </div>
 
+    <!-- Edit Set Name Modal -->
+    <div class="modal" id="edit-set-modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Edit set name</h2>
+            <form id="edit-set-form">
+                <div class="form-group">
+                    <input type="text" id="edit-set-name" class="form-input" placeholder="Nome del set" required>
+                </div>
+                <button type="submit" class="auth-button">Save changes</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         // API Base URL
         const API_URL = '/api';
@@ -891,8 +949,18 @@
                 cardElement.className = 'card-item';
                 cardElement.dataset.cardId = card._id;
                 cardElement.innerHTML = `
-                    <div class="card-menu-button" title="Menu">
-                        <i class="fas fa-ellipsis-v"></i>
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-menu-button" title="Menu">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </div>
+                            <h3>${card.question}</h3>
+                            <div class="tap-hint">Tap to flip</div>
+                        </div>
+                        <div class="card-back">
+                            <h3>${card.answer}</h3>
+                            <div class="tap-hint">Tap to flip</div>
+                        </div>
                     </div>
                     <div class="card-menu">
                         <div class="card-menu-item edit">
@@ -908,8 +976,6 @@
                             Delete
                         </div>
                     </div>
-                    <h3>${card.question}</h3>
-                    <p>${card.answer.substring(0, 50)}${card.answer.length > 50 ? '...' : ''}</p>
                 `;
         
                 // Event listener per il menu
@@ -947,6 +1013,31 @@
                     document.getElementById('target-set-select').disabled = true;
                     document.getElementById('move-card-button').disabled = true;
                     menu.style.display = 'none';
+                });
+                        
+                // Event listener per il flip della card
+                cardElement.addEventListener('click', () => {
+                    // Chiudi il menu quando la card viene flippata
+                    const menu = cardElement.querySelector('.card-menu');
+                    menu.style.display = 'none';
+                    
+                    // Ottieni il pulsante del menu
+                    const menuButton = cardElement.querySelector('.card-menu-button');
+                    
+                    // Se la card è già flippata (stiamo tornando al fronte)
+                    if (cardElement.classList.contains('flipped')) {
+                        // Nascondi temporaneamente il pulsante dei tre puntini
+                        menuButton.style.opacity = '0';
+                        menuButton.style.transition = 'opacity 0.3s';
+                        
+                        // Aggiungi un timer per far riapparire i tre puntini dopo 1 secondo
+                        setTimeout(() => {
+                            menuButton.style.opacity = '1';
+                        }, 200); // 1000ms = 1 secondo
+                    }
+                    
+                    // Esegui il flip della card
+                    cardElement.classList.toggle('flipped');
                 });
         
                 container.appendChild(cardElement);
@@ -1205,10 +1296,21 @@ async function performSearch(query) {
             });
             
             // Pulsante modifica set
-            document.getElementById('edit-button').addEventListener('click', async () => {
-                const newName = prompt('Enter the new name for the set:', document.getElementById('set-title').textContent);
+            document.getElementById('edit-button').addEventListener('click', () => {
+                // Imposta il valore attuale nel campo di input
+                document.getElementById('edit-set-name').value = document.getElementById('set-title').textContent;
+                // Mostra il modale
+                document.getElementById('edit-set-modal').style.display = 'flex';
+                // Focus sull'input
+                document.getElementById('edit-set-name').focus();
+            });
+
+            // Aggiungi questo evento per gestire l'invio del form
+            document.getElementById('edit-set-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newName = document.getElementById('edit-set-name').value.trim();
                 
-                if (newName && newName.trim() !== '') {
+                if (newName !== '') {
                     try {
                         const response = await fetch(`${API_URL}/sets/${currentDeckId}/sets/${currentSetId}`, {
                             method: 'PUT',
@@ -1223,6 +1325,9 @@ async function performSearch(query) {
                         
                         const updatedSet = await response.json();
                         document.getElementById('set-title').textContent = updatedSet.name;
+                        
+                        // Chiudi il modale
+                        document.getElementById('edit-set-modal').style.display = 'none';
                         
                     } catch (error) {
                         console.error('Error:', error);
@@ -1243,7 +1348,8 @@ async function performSearch(query) {
                     document.getElementById('add-card-modal').style.display = 'none';
                     document.getElementById('edit-card-modal').style.display = 'none';
                     document.getElementById('delete-modal').style.display = 'none';
-                    document.getElementById('move-card-modal').style.display = 'none'; // Aggiungi questa riga
+                    document.getElementById('move-card-modal').style.display = 'none';
+                    document.getElementById('edit-set-modal').style.display = 'none'; // Aggiungi questa riga
                 });
             });
             
@@ -1285,18 +1391,23 @@ async function performSearch(query) {
 
             // Pulsante mostra/nascondi risposte
             document.getElementById('toggle-answer-button').addEventListener('click', () => {
-                const answers = document.querySelectorAll('.card-item p');
+                const cards = document.querySelectorAll('.card-item');
                 const icon = document.querySelector('#toggle-answer-button i');
-
-                answers.forEach(answer => {
-                    if (answer.style.display === 'none' || answer.style.display === '') {
-                        answer.style.display = 'block'; // Mostra la risposta
-                        icon.classList.remove('fa-eye');
-                        icon.classList.add('fa-eye-slash');
-                    } else {
-                        answer.style.display = 'none'; // Nascondi la risposta
+            
+                // Controlla se almeno una card è flipped
+                const hasFlippedCards = Array.from(cards).some(card => card.classList.contains('flipped'));
+                
+                cards.forEach(card => {
+                    if (hasFlippedCards) {
+                        // Se ci sono card girate, riporta tutte al fronte
+                        card.classList.remove('flipped');
                         icon.classList.remove('fa-eye-slash');
                         icon.classList.add('fa-eye');
+                    } else {
+                        // Altrimenti gira tutte le card
+                        card.classList.add('flipped');
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
                     }
                 });
             });
@@ -1358,7 +1469,8 @@ async function performSearch(query) {
                     document.getElementById('add-card-modal'),
                     document.getElementById('edit-card-modal'),
                     document.getElementById('delete-modal'),
-                    document.getElementById('move-card-modal')
+                    document.getElementById('move-card-modal'),
+                    document.getElementById('edit-set-modal') // Aggiungi questa riga
                 ];
             
                 modals.forEach(modal => {
@@ -1398,46 +1510,37 @@ async function performSearch(query) {
 
             // Event listeners per le azioni del menu mobile
             document.getElementById('mobile-toggle-answer').addEventListener('click', () => {
-                const answers = document.querySelectorAll('.card-item p');
+                const cards = document.querySelectorAll('.card-item');
                 const icon = document.querySelector('#mobile-toggle-answer i');
                 
-                answers.forEach(answer => {
-                    if (answer.style.display === 'none' || answer.style.display === '') {
-                        answer.style.display = 'block';
-                        icon.classList.remove('fa-eye');
-                        icon.classList.add('fa-eye-slash');
-                    } else {
-                        answer.style.display = 'none';
+                // Controlla se almeno una card è flipped
+                const hasFlippedCards = Array.from(cards).some(card => card.classList.contains('flipped'));
+                
+                cards.forEach(card => {
+                    if (hasFlippedCards) {
+                        // Se ci sono card girate, riporta tutte al fronte
+                        card.classList.remove('flipped');
                         icon.classList.remove('fa-eye-slash');
                         icon.classList.add('fa-eye');
+                    } else {
+                        // Altrimenti gira tutte le card
+                        card.classList.add('flipped');
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
                     }
                 });
-                mobileMenu.style.display = 'none';
+                
+                document.getElementById('mobile-menu').style.display = 'none';
             });
 
-            document.getElementById('mobile-edit').addEventListener('click', async () => {
-                const newName = prompt('Enter the new name for the set:', document.getElementById('set-title').textContent);
-                if (newName && newName.trim() !== '') {
-                    try {
-                        const response = await fetch(`${API_URL}/sets/${currentDeckId}/sets/${currentSetId}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'x-auth-token': localStorage.getItem('token')
-                            },
-                            body: JSON.stringify({ name: newName })
-                        });
-                        
-                        if (!response.ok) throw new Error('Error updating the set');
-                        
-                        const updatedSet = await response.json();
-                        document.getElementById('set-title').textContent = updatedSet.name;
-                        
-                    } catch (error) {
-                        console.error('Error:', error);
-                        alert(`Error: ${error.message}`);
-                    }
-                }
+            document.getElementById('mobile-edit').addEventListener('click', () => {
+                // Imposta il valore attuale nel campo di input
+                document.getElementById('edit-set-name').value = document.getElementById('set-title').textContent;
+                // Mostra il modale
+                document.getElementById('edit-set-modal').style.display = 'flex';
+                // Focus sull'input
+                document.getElementById('edit-set-name').focus();
+                // Chiudi il menu mobile
                 mobileMenu.style.display = 'none';
             });
 

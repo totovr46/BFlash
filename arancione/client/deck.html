@@ -974,32 +974,11 @@ setElement.querySelector('.set-menu-item.edit').addEventListener('click', async 
     const setId = setElement.dataset.setId;
     const currentName = setElement.querySelector('h3').textContent;
     
-    const newName = prompt('Enter new set name:', currentName);
+    // Apri il modale personalizzato invece di usare prompt
+    currentEditSetId = setId;
+    document.getElementById('edit-set-name').value = currentName;
+    document.getElementById('edit-set-modal').style.display = 'flex';
     
-    if (newName && newName.trim() !== '') {
-        try {
-            const response = await fetch(`${API_URL}/sets/${currentDeckId}/sets/${setId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-auth-token': localStorage.getItem('token')
-                },
-                body: JSON.stringify({ name: newName })
-            });
-            
-            if (!response.ok) throw new Error('Error updating set');
-            
-            const updatedSet = await response.json();
-            
-            // Aggiorna il nome del set nell'interfaccia
-            setElement.querySelector('h3').textContent = updatedSet.name;
-            
-            
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error updating set');
-        }
-    }
     menu.style.display = 'none';
 });
 
@@ -1080,7 +1059,7 @@ setElement.addEventListener('click', (e) => {
                     body: JSON.stringify({ name: newName })
                 });
 
-                if (!response.ok) throw new Error('Error editing set');
+                if (!response.ok) throw new Error('Failed to update set');
 
                 const updatedSet = await response.json();
 
@@ -1090,9 +1069,12 @@ setElement.addEventListener('click', (e) => {
 
                 // Chiudi il modale
                 document.getElementById('edit-set-modal').style.display = 'none';
+                
+                // Aggiorna la pagina dopo la modifica del nome
+                window.location.reload();
             } catch (error) {
                 console.error('Error:', error);
-                alert(`Error: ${error.message}`);
+                alert('Error updating set');
             }
         });
 
@@ -1532,21 +1514,53 @@ document.getElementById('sort-button').addEventListener('click', () => {
 });
 
 function sortSets(criteria) {
-    const setsContainer = document.getElementById('sets-container'); // Corretto
+    const setsContainer = document.getElementById('sets-container');
     const sets = Array.from(setsContainer.children);
-
+    
     sets.sort((a, b) => {
-        const aData = a.dataset[criteria];
-        const bData = b.dataset[criteria];
-
         if (criteria === 'name') {
-            return aData.localeCompare(bData);
-        } else {
-            return new Date(aData) - new Date(bData);
+            // Ottieni i nomi dei set
+            const nameA = a.querySelector('h3').textContent.trim();
+            const nameB = b.querySelector('h3').textContent.trim();
+            
+            // Regex che cerca qualsiasi testo seguito da un numero: es. "Capitolo 1", "Set 10", ecc.
+            const regex = /^(.*?)(\d+)(.*)$/;
+            const matchA = nameA.match(regex);
+            const matchB = nameB.match(regex);
+            
+            // Se entrambi i nomi contengono numeri da qualche parte
+            if (matchA && matchB) {
+                // Confronta prima la parte testuale
+                const textA = matchA[1].trim();
+                const textB = matchB[1].trim();
+                
+                // Se la parte testuale è uguale (es. entrambi iniziano con "Capitolo ")
+                if (textA === textB) {
+                    // Ottieni i numeri e confrontali numericamente
+                    const numA = parseInt(matchA[2], 10);
+                    const numB = parseInt(matchB[2], 10);
+                    
+                    // Se i numeri sono diversi, ordina per numero
+                    if (numA !== numB) {
+                        return numA - numB;
+                    }
+                    
+                    // Se i numeri sono uguali, confronta la parte restante
+                    return matchA[3].localeCompare(matchB[3]);
+                }
+            }
+            
+            // Ordinamento alfabetico standard in tutti gli altri casi
+            return nameA.localeCompare(nameB, undefined, {sensitivity: 'base'});
+        } else if (criteria === 'date') {
+            // Ottieni le date di creazione
+            const dateA = new Date(a.dataset.createDate);
+            const dateB = new Date(b.dataset.createDate);
+            return dateB - dateA; // Ordine decrescente (più recenti prima)
         }
     });
-
-    setsContainer.innerHTML = '';
+    
+    // Rimuovi tutti i set e riaggiungili in ordine
     sets.forEach(set => setsContainer.appendChild(set));
 }
     </script>
