@@ -1085,21 +1085,6 @@ setElement.addEventListener('click', (e) => {
 
 
 
-function updateTabVisibility() {
-    const tabs = document.querySelectorAll('.tab-content');
-    const buttons = document.querySelectorAll('.tab-button');
-    
-    // Mostra il primo tab all'avvio
-    if (tabs.length > 0) {
-        tabs[0].classList.add('active');
-    }
-    if (buttons.length > 0) {
-        buttons[0].classList.add('active');
-    }
-}
-
-
-
 // Search functionality
 function setupSearch() {
     const searchInput = document.querySelector('.search-bar');
@@ -1207,11 +1192,24 @@ async function performSearch(query) {
 }
 
         function setupEventListeners() {
-    // Pulsante indietro
+    setupNavigationEvents();
+    setupSetManagementEvents();
+    setupDeckManagementEvents();
+    setupModalEvents();
+    setupUserProfileEvents();
+    setupStudyEvents();
+    setupSearchEvents();
+}
+
+// Gestione eventi di navigazione
+function setupNavigationEvents() {
     document.getElementById('back-button').addEventListener('click', () => {
         window.location.href = 'index.html';
     });
-    
+}
+
+// Gestione eventi per i set
+function setupSetManagementEvents() {
     // Pulsante aggiungi set
     document.getElementById('add-set-button').addEventListener('click', () => {
         document.getElementById('add-set-modal').style.display = 'flex';
@@ -1246,6 +1244,21 @@ async function performSearch(query) {
         }
     });
     
+    // Gestione degli eventi per modifica set
+    document.getElementById('edit-set-form').addEventListener('submit', handleEditSetSubmit);
+    
+    // Chiusura dei menu dropdown quando si clicca altrove
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.set-menu') && !e.target.closest('.set-menu-button')) {
+            document.querySelectorAll('.set-menu').forEach(menu => {
+                menu.style.display = 'none';
+            });
+        }
+    });
+}
+
+// Gestione eventi per il deck
+function setupDeckManagementEvents() {
     // Pulsante elimina deck
     document.getElementById('delete-button').addEventListener('click', async () => {
         if (confirm('Are you sure you want to delete this deck and all its sets? This action cannot be undone.')) {
@@ -1258,10 +1271,7 @@ async function performSearch(query) {
                 });
                 
                 if (!response.ok) throw new Error('Error deleting deck');
-                
-
                 window.location.href = 'index.html';
-                
             } catch (error) {
                 console.error('Error:', error);
                 alert(`Error: ${error.message}`);
@@ -1269,16 +1279,26 @@ async function performSearch(query) {
         }
     });
     
-    // Chiudi modali
-    document.querySelectorAll('.close-modal').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.getElementById('add-set-modal').style.display = 'none';
-            document.getElementById('delete-modal').style.display = 'none';
-            document.getElementById('edit-set-modal').style.display = 'none';
-            document.getElementById('move-set-modal').style.display = 'none';
-        });
-    });
+    // Pulsante per modificare il deck
+    document.getElementById('edit-button').addEventListener('click', openEditDeckModal);
     
+    // Form per modificare il deck
+    document.getElementById('edit-deck-form').addEventListener('submit', handleEditDeckSubmit);
+    
+    // Gestione dell'ordinamento
+    document.getElementById('sort-button').addEventListener('click', cycleSortCriteria);
+}
+
+// Gestione eventi per i modali
+function setupModalEvents() {
+    // Chiudi tutti i modali quando si clicca sul pulsante di chiusura
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', closeAllModals);
+    });
+}
+
+// Gestione eventi del profilo utente
+function setupUserProfileEvents() {
     // Logout
     document.getElementById('logout-button').addEventListener('click', () => {
         localStorage.removeItem('token');
@@ -1299,95 +1319,131 @@ async function performSearch(query) {
             profileDropdown.style.display = 'none';
         }
     });
+}
 
- 
-
-    
-
-    
-
- 
-
-    // Pulsante per modificare il deck
-    document.getElementById('edit-button').addEventListener('click', async () => {
-        try {
-            const response = await fetch(`${API_URL}/decks/${currentDeckId}`, {
-                headers: {
-                    'x-auth-token': localStorage.getItem('token')
-                }
-            });
-            
-            if (!response.ok) throw new Error('Error loading deck details');
-            
-            const deckData = await response.json();
-            
-            // Popola il form solo con subject e description
-            document.getElementById('edit-deck-subject').value = deckData.subject || '';
-            document.getElementById('edit-deck-description').value = deckData.description || '';
-            
-            document.getElementById('edit-deck-modal').style.display = 'flex';
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error loading deck details');
+// Gestione eventi per lo studio
+function setupStudyEvents() {
+    document.getElementById('study-deck-button').addEventListener('click', () => {
+        if (!currentDeckId) {
+            alert('Deck ID mancante!');
+            return;
         }
+        window.location.href = `flashcard.html?deckId=${currentDeckId}`;
     });
     
-    // Modifica la parte che gestisce il submit del form
-    document.getElementById('edit-deck-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    document.getElementById('study-unknown-button').addEventListener('click', () => {
+        window.location.href = `flashcard.html?deckId=${currentDeckId}&mode=unknown`;
+    });
+}
+
+// Funzioni helper
+function closeAllModals() {
+    document.getElementById('add-set-modal').style.display = 'none';
+    document.getElementById('delete-modal').style.display = 'none';
+    document.getElementById('edit-set-modal').style.display = 'none';
+    document.getElementById('edit-deck-modal').style.display = 'none';
+    document.getElementById('move-set-modal').style.display = 'none';
+}
+
+// Gestione dell'apertura e chiusura del modale di modifica deck
+async function openEditDeckModal() {
+    try {
+        const response = await fetch(`${API_URL}/decks/${currentDeckId}`, {
+            headers: {
+                'x-auth-token': localStorage.getItem('token')
+            }
+        });
         
-        const updatedDeck = {
-            subject: document.getElementById('edit-deck-subject').value,
-            description: document.getElementById('edit-deck-description').value
-        };
+        if (!response.ok) throw new Error('Error loading deck details');
         
-        try {
-            const response = await fetch(`${API_URL}/decks/${currentDeckId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-auth-token': localStorage.getItem('token')
-                },
-                body: JSON.stringify(updatedDeck)
-            });
-            
-            if (!response.ok) throw new Error('Error updating deck');
-            
-            const newDeckData = await response.json();
-            
-            // Aggiorna il titolo nella pagina usando il subject
-            document.getElementById('deck-title').textContent = newDeckData.subject || 'Untitled';
-            document.title = `${newDeckData.subject || 'Mazzo'} - Bflash`;
-            
-            document.getElementById('edit-deck-modal').style.display = 'none';
+        const deckData = await response.json();
+        
+        // Popola il form
+        document.getElementById('edit-deck-subject').value = deckData.subject || '';
+        document.getElementById('edit-deck-description').value = deckData.description || '';
+        
+        document.getElementById('edit-deck-modal').style.display = 'flex';
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error loading deck details');
+    }
+}
 
-            
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error updating deck');
-        }
-                    // Chiudi i menu quando si clicca fuori
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.set-menu') && !e.target.closest('.set-menu-button')) {
-            document.querySelectorAll('.set-menu').forEach(menu => {
-                menu.style.display = 'none';
-            });
-        }
-    });
-    });
+// Gestione del submit del form di modifica deck
+async function handleEditDeckSubmit(e) {
+    e.preventDefault();
+    
+    const updatedDeck = {
+        subject: document.getElementById('edit-deck-subject').value,
+        description: document.getElementById('edit-deck-description').value
+    };
+    
+    try {
+        const response = await fetch(`${API_URL}/decks/${currentDeckId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-auth-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify(updatedDeck)
+        });
+        
+        if (!response.ok) throw new Error('Error updating deck');
+        
+        const newDeckData = await response.json();
+        
+        // Aggiorna il titolo nella pagina usando il subject
+        document.getElementById('deck-title').textContent = newDeckData.subject || 'Untitled';
+        document.title = `${newDeckData.subject || 'Mazzo'} - Bflash`;
+        
+        document.getElementById('edit-deck-modal').style.display = 'none';
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error updating deck');
+    }
+}
 
-document.querySelectorAll('.close-modal').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.getElementById('add-set-modal').style.display = 'none';
-        document.getElementById('delete-modal').style.display = 'none';
+// Gestione del submit del form di modifica set
+async function handleEditSetSubmit(e) {
+    e.preventDefault();
+    const newName = document.getElementById('edit-set-name').value;
+
+    try {
+        const response = await fetch(`${API_URL}/sets/${currentDeckId}/sets/${currentEditSetId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-auth-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({ name: newName })
+        });
+
+        if (!response.ok) throw new Error('Failed to update set');
+
+        const updatedSet = await response.json();
+
+        // Aggiorna il set nella lista corrente
+        currentSets = currentSets.map(set => set._id === updatedSet._id ? updatedSet : set);
+        displaySets(currentSets);
+
+        // Chiudi il modale
         document.getElementById('edit-set-modal').style.display = 'none';
-        document.getElementById('edit-deck-modal').style.display = 'none'; // Aggiungi questa riga
-    });
-});
-    // Inizializza la visibilità dei tab
-    updateTabVisibility();
-    setupSearch(); // Aggiungi questa riga
+        
+        // Aggiorna la pagina dopo la modifica del nome
+        window.location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error updating set');
+    }
+}
 
+// Gestione del ciclo dei criteri di ordinamento
+function cycleSortCriteria() {
+    const sortOptions = ['name', 'createdAt', 'updatedAt'];
+    const currentSort = localStorage.getItem('setSort') || 'name';
+    const nextSort = sortOptions[(sortOptions.indexOf(currentSort) + 1) % sortOptions.length];
+    localStorage.setItem('setSort', nextSort);
+    sortSets(nextSort);
 }
        
         
@@ -1513,11 +1569,19 @@ document.getElementById('sort-button').addEventListener('click', () => {
     sortButton.innerHTML = `<i class="${sortIcons[nextSort]}"></i>`;
 });
 
+// Miglioramento della funzione sortSets per gestire tutti i criteri
 function sortSets(criteria) {
     const setsContainer = document.getElementById('sets-container');
     const sets = Array.from(setsContainer.children);
     
+    if (sets.length <= 1) return; // Non serve ordinare un solo elemento
+    
     sets.sort((a, b) => {
+        // Verifica se gli elementi sono set card validi
+        if (!a.classList.contains('set-card') || !b.classList.contains('set-card')) {
+            return 0;
+        }
+        
         if (criteria === 'name') {
             // Ottieni i nomi dei set
             const nameA = a.querySelector('h3').textContent.trim();
@@ -1552,16 +1616,36 @@ function sortSets(criteria) {
             
             // Ordinamento alfabetico standard in tutti gli altri casi
             return nameA.localeCompare(nameB, undefined, {sensitivity: 'base'});
-        } else if (criteria === 'date') {
-            // Ottieni le date di creazione
-            const dateA = new Date(a.dataset.createDate);
-            const dateB = new Date(b.dataset.createDate);
-            return dateB - dateA; // Ordine decrescente (più recenti prima)
+        } else if (criteria === 'createdAt') {
+            // Ordina per data di creazione (dalla più recente)
+            const dateA = new Date(a.dataset.createdAt);
+            const dateB = new Date(b.dataset.createdAt);
+            return dateB - dateA; // Ordine decrescente
+        } else if (criteria === 'updatedAt') {
+            // Ordina per data di ultima modifica (dalla più recente)
+            const dateA = new Date(a.dataset.updatedAt);
+            const dateB = new Date(b.dataset.updatedAt);
+            return dateB - dateA; // Ordine decrescente
         }
+        
+        // Default: non cambiare l'ordine
+        return 0;
     });
     
     // Rimuovi tutti i set e riaggiungili in ordine
     sets.forEach(set => setsContainer.appendChild(set));
+    
+    // Aggiorna l'icona del pulsante di ordinamento
+    const sortButton = document.getElementById('sort-button');
+    const sortIcons = {
+        name: 'fas fa-sort-alpha-down',
+        createdAt: 'fas fa-calendar-plus',
+        updatedAt: 'fas fa-calendar-check'
+    };
+    
+    if (sortButton && sortIcons[criteria]) {
+        sortButton.innerHTML = `<i class="${sortIcons[criteria]}"></i>`;
+    }
 }
     </script>
 </body>
